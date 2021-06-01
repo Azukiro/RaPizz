@@ -1,0 +1,11 @@
+Sizes = (id_size INT, label VARCHAR(8), multiplicator DOUBLE);
+Ingredients = (id_ingredient INT, label VARCHAR(20));
+DeliveryGuys = (id_delivery_guy INT, firstname VARCHAR(30), lastname VARCHAR(30), phone CHAR(10), mail VARCHAR(50));
+VehicleTypes = (id_vehicle_types INT, label VARCHAR(10));
+City = (zip CHAR(5), name VARCHAR(30));
+Pizzas = (id_pizza INT, label VARCHAR(20), price DOUBLE, #id_size);
+Vehicles = (id_vehicle INT, licence_plate CHAR(9), label VARCHAR(20), #id_vehicle_types);
+Clients = (id_client INT, firstname VARCHAR(20), lastname VARCHAR(20), phone CHAR(10), adress VARCHAR(50), #(zip, name));
+Account = (id_login INT, mail VARCHAR(50), password VARCHAR(50), account_balance DOUBLE, #id_client);
+Orders = (id_order INT, order_timestamp DATETIME, delivry_timestamp DATETIME, #id_vehicle, #id_client, #id_delivery_guy, #id_pizza);
+Composing = (#id_pizza, #id_ingredient);
