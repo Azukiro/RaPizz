@@ -59,9 +59,9 @@ INSERT INTO composing(id_pizza, id_ingredient) VALUES (3,3);
 
 
 
-INSERT INTO sizes(id_size, label, multiplicator) VALUES (null,"naine",0.6);
-INSERT INTO sizes(id_size, label, multiplicator) VALUES (null,"humaine",1);
-INSERT INTO sizes(id_size, label, multiplicator) VALUES (null,"ogresse",1.3);
+INSERT INTO pizzasizes(id_size, label, multiplicator) VALUES (null,"naine",0.6);
+INSERT INTO pizzasizes(id_size, label, multiplicator) VALUES (null,"humaine",1);
+INSERT INTO pizzasizes(id_size, label, multiplicator) VALUES (null,"ogresse",1.3);
 
 
 

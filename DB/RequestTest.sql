@@ -1,0 +1,1 @@
+SELECT C.firstname, C.lastname, C.id_client ,COUNT(DISTINCT O.id_client) as "nbOrders" FROM orders O INNER JOIN clients C ON O.id_client = C.id_client; //Meilleur Client

@@ -111,3 +111,9 @@ CREATE TABLE Orders(
    FOREIGN KEY(id_delivery_guy) REFERENCES DeliveryGuys(id_delivery_guy),
    FOREIGN KEY(id_pizza) REFERENCES Pizzas(id_pizza)
 );
+
+
+
+
+
+
