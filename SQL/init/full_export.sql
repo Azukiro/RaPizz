@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.2
+-- version 5.0.4
 -- https://www.phpmyadmin.net/
 --
--- Hôte : 127.0.0.1:3306
--- Généré le : mar. 01 juin 2021 à 16:50
--- Version du serveur :  5.7.31
--- Version de PHP : 7.3.21
+-- Hôte : 127.0.0.1
+-- Généré le : mar. 01 juin 2021 à 19:32
+-- Version du serveur :  10.4.17-MariaDB
+-- Version de PHP : 7.3.27
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données : `rapizz`
+-- Base de données : `RaPizz`
 --
 
 -- --------------------------------------------------------
@@ -27,17 +27,13 @@ SET time_zone = "+00:00";
 -- Structure de la table `account`
 --
 
-DROP TABLE IF EXISTS `account`;
-CREATE TABLE IF NOT EXISTS `account` (
-  `id_login` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `account` (
+  `id_login` int(11) NOT NULL,
   `mail` varchar(50) NOT NULL,
   `password` varchar(50) NOT NULL,
   `account_balance` double NOT NULL,
-  `id_client` int(11) NOT NULL,
-  PRIMARY KEY (`id_login`),
-  UNIQUE KEY `id_client` (`id_client`),
-  UNIQUE KEY `mail` (`mail`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+  `id_client` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `account`
@@ -56,12 +52,10 @@ INSERT INTO `account` (`id_login`, `mail`, `password`, `account_balance`, `id_cl
 -- Structure de la table `city`
 --
 
-DROP TABLE IF EXISTS `city`;
-CREATE TABLE IF NOT EXISTS `city` (
+CREATE TABLE `city` (
   `zip` char(5) NOT NULL,
-  `name` varchar(30) NOT NULL,
-  PRIMARY KEY (`zip`,`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  `name` varchar(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `city`
@@ -81,18 +75,15 @@ INSERT INTO `city` (`zip`, `name`) VALUES
 -- Structure de la table `clients`
 --
 
-DROP TABLE IF EXISTS `clients`;
-CREATE TABLE IF NOT EXISTS `clients` (
-  `id_client` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `clients` (
+  `id_client` int(11) NOT NULL,
   `firstname` varchar(20) NOT NULL,
   `lastname` varchar(20) NOT NULL,
   `phone` char(10) NOT NULL,
   `adress` varchar(50) NOT NULL,
   `zip` char(5) NOT NULL,
-  `name` varchar(30) NOT NULL,
-  PRIMARY KEY (`id_client`),
-  KEY `zip` (`zip`,`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+  `name` varchar(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `clients`
@@ -111,13 +102,10 @@ INSERT INTO `clients` (`id_client`, `firstname`, `lastname`, `phone`, `adress`, 
 -- Structure de la table `composing`
 --
 
-DROP TABLE IF EXISTS `composing`;
-CREATE TABLE IF NOT EXISTS `composing` (
+CREATE TABLE `composing` (
   `id_pizza` int(11) NOT NULL,
-  `id_ingredient` int(11) NOT NULL,
-  PRIMARY KEY (`id_pizza`,`id_ingredient`),
-  KEY `id_ingredient` (`id_ingredient`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  `id_ingredient` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `composing`
@@ -144,15 +132,13 @@ INSERT INTO `composing` (`id_pizza`, `id_ingredient`) VALUES
 -- Structure de la table `deliveryguys`
 --
 
-DROP TABLE IF EXISTS `deliveryguys`;
-CREATE TABLE IF NOT EXISTS `deliveryguys` (
-  `id_delivery_guy` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `deliveryguys` (
+  `id_delivery_guy` int(11) NOT NULL,
   `firstname` varchar(30) NOT NULL,
   `lastname` varchar(30) NOT NULL,
   `phone` char(10) NOT NULL,
-  `mail` varchar(50) NOT NULL,
-  PRIMARY KEY (`id_delivery_guy`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+  `mail` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `deliveryguys`
@@ -171,53 +157,50 @@ INSERT INTO `deliveryguys` (`id_delivery_guy`, `firstname`, `lastname`, `phone`,
 -- Structure de la table `ingredients`
 --
 
-DROP TABLE IF EXISTS `ingredients`;
-CREATE TABLE IF NOT EXISTS `ingredients` (
-  `id_ingredient` int(11) NOT NULL AUTO_INCREMENT,
-  `label` varchar(20) NOT NULL,
-  PRIMARY KEY (`id_ingredient`),
-  UNIQUE KEY `label` (`label`)
-) ENGINE=MyISAM AUTO_INCREMENT=36 DEFAULT CHARSET=latin1;
+CREATE TABLE `ingredients` (
+  `id_ingredient` int(11) NOT NULL,
+  `label` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `ingredients`
 --
 
 INSERT INTO `ingredients` (`id_ingredient`, `label`) VALUES
-(1, 'Olives Verte'),
-(2, 'Olives Noire'),
+(23, 'Ail'),
+(15, 'Basilic'),
 (3, 'Champignon'),
-(4, 'Sauce tomate'),
-(5, 'Mozarella'),
-(6, 'Ricotta'),
-(7, 'Poulet'),
-(8, 'Jambon'),
 (9, 'Chorizo'),
-(10, 'Saucisson'),
+(14, 'Crème fraiche'),
+(31, 'Fromage de chèvre'),
+(20, 'Fromage râpée'),
 (11, 'Gorgonzola'),
+(34, 'Huile piquante'),
+(8, 'Jambon'),
+(26, 'Jambon de pays'),
+(28, 'Maïs'),
+(17, 'Merguez'),
+(32, 'Miel'),
+(5, 'Mozarella'),
+(19, 'Oeuf'),
+(2, 'Olives Noire'),
+(1, 'Olives Verte'),
+(22, 'Parmesan'),
+(33, 'Persil'),
+(21, 'Pomme de terre'),
+(7, 'Poulet'),
+(6, 'Ricotta'),
+(27, 'Roquette'),
 (12, 'Sauce barbecue'),
 (13, 'Sauce chedar'),
-(14, 'Crème fraiche'),
-(15, 'Basilic'),
-(16, 'Truffe'),
-(17, 'Merguez'),
 (18, 'Sauce piquante'),
-(19, 'Oeuf'),
-(20, 'Fromage râpée'),
-(21, 'Pomme de terre'),
-(22, 'Parmesan'),
-(23, 'Ail'),
-(24, 'Sel'),
+(4, 'Sauce tomate'),
+(10, 'Saucisson'),
 (25, 'Saumon fumée'),
-(26, 'Jambon de pays'),
-(27, 'Roquette'),
-(28, 'Maïs'),
-(29, 'Tomate séchée'),
+(24, 'Sel'),
 (30, 'Tomate cerise'),
-(31, 'Fromage de chèvre'),
-(32, 'Miel'),
-(33, 'Persil'),
-(34, 'Huile piquante');
+(29, 'Tomate séchée'),
+(16, 'Truffe');
 
 -- --------------------------------------------------------
 
@@ -225,23 +208,16 @@ INSERT INTO `ingredients` (`id_ingredient`, `label`) VALUES
 -- Structure de la table `orders`
 --
 
-DROP TABLE IF EXISTS `orders`;
-CREATE TABLE IF NOT EXISTS `orders` (
-  `id_order` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `orders` (
+  `id_order` int(11) NOT NULL,
   `order_timestamp` datetime NOT NULL,
   `delivry_timestamp` datetime DEFAULT NULL,
   `id_size` int(11) NOT NULL,
   `id_vehicle` int(11) NOT NULL,
   `id_client` int(11) NOT NULL,
   `id_delivery_guy` int(11) NOT NULL,
-  `id_pizza` int(11) NOT NULL,
-  PRIMARY KEY (`id_order`),
-  KEY `id_size` (`id_size`),
-  KEY `id_vehicle` (`id_vehicle`),
-  KEY `id_client` (`id_client`),
-  KEY `id_delivery_guy` (`id_delivery_guy`),
-  KEY `id_pizza` (`id_pizza`)
-) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
+  `id_pizza` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `orders`
@@ -270,14 +246,11 @@ INSERT INTO `orders` (`id_order`, `order_timestamp`, `delivry_timestamp`, `id_si
 -- Structure de la table `pizzas`
 --
 
-DROP TABLE IF EXISTS `pizzas`;
-CREATE TABLE IF NOT EXISTS `pizzas` (
-  `id_pizza` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `pizzas` (
+  `id_pizza` int(11) NOT NULL,
   `label` varchar(20) NOT NULL,
-  `price` double NOT NULL,
-  PRIMARY KEY (`id_pizza`),
-  UNIQUE KEY `label` (`label`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+  `price` double NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `pizzas`
@@ -294,35 +267,17 @@ INSERT INTO `pizzas` (`id_pizza`, `label`, `price`) VALUES
 -- Structure de la table `pizzasizes`
 --
 
-DROP TABLE IF EXISTS `pizzasizes`;
-CREATE TABLE IF NOT EXISTS `pizzasizes` (
-  `id_size` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `pizzasizes` (
+  `id_size` int(11) NOT NULL,
   `label` varchar(8) NOT NULL,
-  `multiplicator` double NOT NULL,
-  PRIMARY KEY (`id_size`),
-  UNIQUE KEY `label` (`label`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
+  `multiplicator` double NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Structure de la table `sizes`
+-- Déchargement des données de la table `pizzasizes`
 --
 
-DROP TABLE IF EXISTS `sizes`;
-CREATE TABLE IF NOT EXISTS `sizes` (
-  `id_size` int(11) NOT NULL AUTO_INCREMENT,
-  `label` varchar(8) NOT NULL,
-  `multiplicator` double NOT NULL,
-  PRIMARY KEY (`id_size`),
-  UNIQUE KEY `label` (`label`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
-
---
--- Déchargement des données de la table `sizes`
---
-
-INSERT INTO `sizes` (`id_size`, `label`, `multiplicator`) VALUES
+INSERT INTO `pizzasizes` (`id_size`, `label`, `multiplicator`) VALUES
 (1, 'naine', 0.6),
 (2, 'humaine', 1),
 (3, 'ogresse', 1.3);
@@ -333,15 +288,12 @@ INSERT INTO `sizes` (`id_size`, `label`, `multiplicator`) VALUES
 -- Structure de la table `vehicles`
 --
 
-DROP TABLE IF EXISTS `vehicles`;
-CREATE TABLE IF NOT EXISTS `vehicles` (
-  `id_vehicle` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `vehicles` (
+  `id_vehicle` int(11) NOT NULL,
   `licence_plate` char(9) DEFAULT NULL,
   `label` varchar(20) NOT NULL,
-  `id_vehicle_types` int(11) NOT NULL,
-  PRIMARY KEY (`id_vehicle`),
-  KEY `id_vehicle_types` (`id_vehicle_types`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+  `id_vehicle_types` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `vehicles`
@@ -360,13 +312,10 @@ INSERT INTO `vehicles` (`id_vehicle`, `licence_plate`, `label`, `id_vehicle_type
 -- Structure de la table `vehicletypes`
 --
 
-DROP TABLE IF EXISTS `vehicletypes`;
-CREATE TABLE IF NOT EXISTS `vehicletypes` (
-  `id_vehicle_types` int(11) NOT NULL AUTO_INCREMENT,
-  `label` varchar(10) NOT NULL,
-  PRIMARY KEY (`id_vehicle_types`),
-  UNIQUE KEY `label` (`label`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+CREATE TABLE `vehicletypes` (
+  `id_vehicle_types` int(11) NOT NULL,
+  `label` varchar(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `vehicletypes`
@@ -375,6 +324,129 @@ CREATE TABLE IF NOT EXISTS `vehicletypes` (
 INSERT INTO `vehicletypes` (`id_vehicle_types`, `label`) VALUES
 (2, 'moto'),
 (1, 'voiture');
+
+--
+-- Index pour les tables déchargées
+--
+
+--
+-- Index pour la table `account`
+--
+ALTER TABLE `account`
+  ADD PRIMARY KEY (`id_login`),
+  ADD UNIQUE KEY `id_client` (`id_client`),
+  ADD UNIQUE KEY `mail` (`mail`);
+
+--
+-- Index pour la table `city`
+--
+ALTER TABLE `city`
+  ADD PRIMARY KEY (`zip`,`name`);
+
+--
+-- Index pour la table `clients`
+--
+ALTER TABLE `clients`
+  ADD PRIMARY KEY (`id_client`),
+  ADD KEY `zip` (`zip`,`name`);
+
+--
+-- Index pour la table `composing`
+--
+ALTER TABLE `composing`
+  ADD PRIMARY KEY (`id_pizza`,`id_ingredient`),
+  ADD KEY `id_ingredient` (`id_ingredient`);
+
+--
+-- Index pour la table `deliveryguys`
+--
+ALTER TABLE `deliveryguys`
+  ADD PRIMARY KEY (`id_delivery_guy`);
+
+--
+-- Index pour la table `ingredients`
+--
+ALTER TABLE `ingredients`
+  ADD PRIMARY KEY (`id_ingredient`),
+  ADD UNIQUE KEY `label` (`label`);
+
+--
+-- Index pour la table `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`id_order`),
+  ADD KEY `id_size` (`id_size`),
+  ADD KEY `id_vehicle` (`id_vehicle`),
+  ADD KEY `id_client` (`id_client`),
+  ADD KEY `id_delivery_guy` (`id_delivery_guy`),
+  ADD KEY `id_pizza` (`id_pizza`);
+
+--
+-- Index pour la table `pizzas`
+--
+ALTER TABLE `pizzas`
+  ADD PRIMARY KEY (`id_pizza`),
+  ADD UNIQUE KEY `label` (`label`);
+
+--
+-- Index pour la table `pizzasizes`
+--
+ALTER TABLE `pizzasizes`
+  ADD PRIMARY KEY (`id_size`),
+  ADD UNIQUE KEY `label` (`label`);
+
+--
+-- Index pour la table `vehicles`
+--
+ALTER TABLE `vehicles`
+  ADD PRIMARY KEY (`id_vehicle`),
+  ADD KEY `id_vehicle_types` (`id_vehicle_types`);
+
+--
+-- Index pour la table `vehicletypes`
+--
+ALTER TABLE `vehicletypes`
+  ADD PRIMARY KEY (`id_vehicle_types`),
+  ADD UNIQUE KEY `label` (`label`);
+
+--
+-- Contraintes pour les tables déchargées
+--
+
+--
+-- Contraintes pour la table `account`
+--
+ALTER TABLE `account`
+  ADD CONSTRAINT `account_ibfk_1` FOREIGN KEY (`id_client`) REFERENCES `clients` (`id_client`);
+
+--
+-- Contraintes pour la table `clients`
+--
+ALTER TABLE `clients`
+  ADD CONSTRAINT `clients_ibfk_1` FOREIGN KEY (`zip`,`name`) REFERENCES `city` (`zip`, `name`);
+
+--
+-- Contraintes pour la table `composing`
+--
+ALTER TABLE `composing`
+  ADD CONSTRAINT `composing_ibfk_1` FOREIGN KEY (`id_pizza`) REFERENCES `pizzas` (`id_pizza`),
+  ADD CONSTRAINT `composing_ibfk_2` FOREIGN KEY (`id_ingredient`) REFERENCES `ingredients` (`id_ingredient`);
+
+--
+-- Contraintes pour la table `orders`
+--
+ALTER TABLE `orders`
+  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`id_size`) REFERENCES `pizzasizes` (`id_size`),
+  ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`id_vehicle`) REFERENCES `vehicles` (`id_vehicle`),
+  ADD CONSTRAINT `orders_ibfk_3` FOREIGN KEY (`id_client`) REFERENCES `clients` (`id_client`),
+  ADD CONSTRAINT `orders_ibfk_4` FOREIGN KEY (`id_delivery_guy`) REFERENCES `deliveryguys` (`id_delivery_guy`),
+  ADD CONSTRAINT `orders_ibfk_5` FOREIGN KEY (`id_pizza`) REFERENCES `pizzas` (`id_pizza`);
+
+--
+-- Contraintes pour la table `vehicles`
+--
+ALTER TABLE `vehicles`
+  ADD CONSTRAINT `vehicles_ibfk_1` FOREIGN KEY (`id_vehicle_types`) REFERENCES `vehicletypes` (`id_vehicle_types`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

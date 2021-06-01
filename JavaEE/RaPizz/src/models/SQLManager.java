@@ -11,7 +11,7 @@ public class SQLManager{
 
     
     private static final String username = "root";
-    private static final String password = ""; // le mien c'était le mot de passe de mon compte windows
+    private static final String password = ""; // le mien c'ï¿½tait le mot de passe de mon compte windows
     private static final String serverName = "localhost";
     private static final String database = "tp5";
     private static final int port = 3306;
