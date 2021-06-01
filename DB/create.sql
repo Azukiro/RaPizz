@@ -1,5 +1,5 @@
 CREATE TABLE Sizes(
-   id_size INT,
+   id_size INT AUTO_INCREMENT,
    label VARCHAR(8) NOT NULL,
    multiplicator DOUBLE NOT NULL,
    PRIMARY KEY(id_size),
@@ -7,14 +7,14 @@ CREATE TABLE Sizes(
 );
 
 CREATE TABLE Ingredients(
-   id_ingredient INT,
+   id_ingredient INT AUTO_INCREMENT,
    label VARCHAR(20) NOT NULL,
    PRIMARY KEY(id_ingredient),
    UNIQUE(label)
 );
 
 CREATE TABLE DeliveryGuys(
-   id_delivery_guy INT,
+   id_delivery_guy INT AUTO_INCREMENT,
    firstname VARCHAR(30) NOT NULL,
    lastname VARCHAR(30) NOT NULL,
    phone CHAR(10) NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE DeliveryGuys(
 );
 
 CREATE TABLE VehicleTypes(
-   id_vehicle_types INT,
+   id_vehicle_types INT AUTO_INCREMENT,
    label VARCHAR(10) NOT NULL,
    PRIMARY KEY(id_vehicle_types),
    UNIQUE(label)
@@ -36,7 +36,7 @@ CREATE TABLE City(
 );
 
 CREATE TABLE Pizzas(
-   id_pizza INT,
+   id_pizza INT AUTO_INCREMENT,
    label VARCHAR(20) NOT NULL,
    price DOUBLE NOT NULL,
    id_size INT NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE Pizzas(
 );
 
 CREATE TABLE Vehicles(
-   id_vehicle INT,
+   id_vehicle INT AUTO_INCREMENT,
    licence_plate CHAR(9),
    label VARCHAR(20) NOT NULL,
    id_vehicle_types INT NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE Vehicles(
 );
 
 CREATE TABLE Clients(
-   id_client INT,
+   id_client INT AUTO_INCREMENT,
    firstname VARCHAR(20) NOT NULL,
    lastname VARCHAR(20) NOT NULL,
    phone CHAR(10) NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE Clients(
 );
 
 CREATE TABLE Account(
-   id_login INT,
+   id_login INT AUTO_INCREMENT,
    mail VARCHAR(50) NOT NULL,
    password VARCHAR(50) NOT NULL,
    account_balance DOUBLE NOT NULL,
@@ -79,7 +79,7 @@ CREATE TABLE Account(
 );
 
 CREATE TABLE Orders(
-   id_order INT,
+   id_order INT AUTO_INCREMENT,
    order_timestamp DATETIME NOT NULL,
    delivry_timestamp DATETIME,
    id_vehicle INT NOT NULL,
