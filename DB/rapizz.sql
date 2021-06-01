@@ -217,8 +217,7 @@ INSERT INTO `ingredients` (`id_ingredient`, `label`) VALUES
 (31, 'Fromage de chèvre'),
 (32, 'Miel'),
 (33, 'Persil'),
-(34, 'Huile d\'olive'),
-(35, 'Huile piquante');
+(34, 'Huile piquante');
 
 -- --------------------------------------------------------
 
