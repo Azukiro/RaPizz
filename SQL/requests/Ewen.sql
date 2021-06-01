@@ -55,16 +55,29 @@
         AVG(pizz.price * size.multiplicator)
     FROM orders             AS orde
     JOIN pizzas             AS pizz     ON orde.id_pizza = pizz.id_pizza
-    JOIN sizes              AS size     ON orde.id_size  = size.id_size;
+    JOIN pizzasizes              AS size     ON orde.id_size  = size.id_size;
 
 
 -- Extraction des clients ayant commandé plus que la moyenne ?
-
     SELECT
-        clien.id_client,
-        clien.firstname,
-        clien.lastname
-    FROM orders             AS orde
-    JOIN pizzas             AS pizz     ON orde.id_pizza   = pizz.id_pizza
-    JOIN sizes              AS size     ON orde.id_size    = size.id_size
-    JOIN clients            AS clien    ON orde.id_client  = clien.id_client
+        r1_clien.id_client,
+        r1_clien.firstname,
+        r1_clien.lastname
+    FROM clients            AS r1_clien
+    WHERE 
+        EXISTS (
+            SELECT r2_orde.id_order
+                FROM orders         AS r2_orde
+            JOIN pizzas             AS r2_pizz     ON r2_orde.id_pizza   = r2_pizz.id_pizza
+            JOIN pizzasizes              AS r2_size     ON r2_orde.id_size    = r2_size.id_size
+            WHERE 
+                r2_orde.id_client = r1_clien.id_client
+                    AND
+                r2_pizz.price * r2_size.multiplicator > (
+                    SELECT
+                        AVG(r3_pizz.price * r3_size.multiplicator)
+                    FROM orders             AS r3_orde
+                    JOIN pizzas             AS r3_pizz     ON r3_orde.id_pizza = r3_pizz.id_pizza
+                    JOIN pizzasizes         AS r3_size     ON r3_orde.id_size  = r3_size.id_size
+                )
+        )
