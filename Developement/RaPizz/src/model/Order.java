@@ -4,13 +4,16 @@ import java.util.Date;
 
 public class Order {
 	
-	private final int id;
-	private final Pizza pizza;
-	private final Client client;
-	private final DeliveryGuy deliveryGuy;
-	private final Vehicle vehicle;
-	private final Date orderTime;
-	private final Date deliveryTime;
+	private int id;
+	private Pizza pizza;
+	private Client client;
+	private DeliveryGuy deliveryGuy;
+	private Vehicle vehicle;
+	private Date orderTime;
+	private  Date deliveryTime;
+	
+	public Order() 
+	{}
 	
 	public Order(int id, Pizza pizza, Client client, DeliveryGuy deliveryGuy, Vehicle vehicle, Date orderTime,
 			Date deliveryTime) {
@@ -23,6 +26,36 @@ public class Order {
 		this.orderTime = orderTime;
 		this.deliveryTime = deliveryTime;
 	}
+
+	public int getId() {
+		return id;
+	}
+
+	public Pizza getPizza() {
+		return pizza;
+	}
+
+	public Client getClient() {
+		return client;
+	}
+
+	public DeliveryGuy getDeliveryGuy() {
+		return deliveryGuy;
+	}
+
+	public Vehicle getVehicle() {
+		return vehicle;
+	}
+
+	public Date getOrderTime() {
+		return orderTime;
+	}
+
+	public Date getDeliveryTime() {
+		return deliveryTime;
+	}
+	
+	
 	
 	
 	

@@ -13,5 +13,9 @@ public class Vehicle {
 		this.type = type;
 	}
 	
-	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return label;
+	}
 }

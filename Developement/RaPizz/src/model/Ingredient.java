@@ -11,5 +11,4 @@ public class Ingredient {
 		this.label = label;
 	}
 	
-	
 }

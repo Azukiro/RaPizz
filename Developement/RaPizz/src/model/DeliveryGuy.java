@@ -15,4 +15,10 @@ public class DeliveryGuy {
 		this.phone = phone;
 	}
 	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return lastName;
+	}
+	
 }
