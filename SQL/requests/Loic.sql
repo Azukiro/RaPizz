@@ -15,7 +15,7 @@ ORDER BY
 DESC
 LIMIT 1;
 
--- Meilleur pizza
+-- Meilleure pizza
 SELECT
     pizz.label,
      orde.id_pizza,
@@ -47,7 +47,7 @@ ORDER BY
 ASC
 LIMIT 1;
 
--- Verification du solde
+-- Vérification du solde
 SELECT
     acco.account_balance
 FROM

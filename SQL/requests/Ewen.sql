@@ -82,7 +82,115 @@
                         JOIN pizzas             AS r3_pizz     ON r3_orde.id_pizza = r3_pizz.id_pizza
                         JOIN pizzasizes         AS r3_size     ON r3_orde.id_size  = r3_size.id_size
                     )
-            )
+            );
 
 -- Objectifs du système
-    --  Identification du plus mauvais livreur (nombre de retards dans la livraison) et du véhicule utilisé
+
+    -- Suivi du chiffre d’affaires
+    (
+        -- Order price
+        SELECT
+            DATE_FORMAT(orde.delivry_timestamp, "%Y/%d"),
+            SUM(pizz.price * pisi.multiplicator) AS turnover 
+        FROM orders         AS orde
+        JOIN pizzas         AS pizz     ON pizz.id_pizza = orde.id_pizza
+        JOIN pizzasizes     AS pisi     ON pisi.id_size  = orde.id_size
+        GROUP BY DATE_FORMAT(orde.delivry_timestamp, "%Y/%d")
+    );
+
+    -- Refus d’honorer les commandes pour lesquelles le solde du compte client est insuffisant ;
+    -- => $orderId, $accountId
+    SELECT 
+        0 <= (
+            (
+                -- Client account
+                SELECT
+                    acco.account_balance
+                FROM account AS acco
+                WHERE  
+                    acco.id_client = 1
+            )
+                -
+            (
+                -- Order price
+                SELECT
+                    pizz.price * pisi.multiplicator AS price
+                FROM orders         AS orde
+                JOIN pizzas         AS pizz     ON pizz.id_pizza = orde.id_pizza
+                JOIN pizzasizes     AS pisi     ON pisi.id_size  = orde.id_size
+                WHERE  
+                    orde.id_order = 1
+            )
+        ) AS can_buy;
+
+    -- Non-facturation des pizzas gratuites (retard ou fidélité)
+    -- => $orderId, $clientId
+    SELECT
+        (
+            (
+                -- Free 10 pizza
+                SELECT
+                    (
+                        COUNT(r2_orde.id_order) % 10
+                    ) = 0 AS free_10_pizza
+                FROM orders             AS r2_orde
+                WHERE 
+                    r2_orde.id_client = 1
+            )
+                OR
+            (
+                -- Free late pizza
+                SELECT
+                    (
+                        DATEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) >= 1
+                            OR
+                        (
+                            DATEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) = 0
+                                AND
+                            TIMEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) >= "00:30:00"
+                        )
+                    ) AS late_order
+                FROM orders             AS r2_orde
+                WHERE 
+                    r2_orde.id_order = 1
+            )
+        ) AS is_pizza_free;
+        
+
+    --  Identification du plus mauvais livreur et de la voiture utilisée (nombre de retards dans la livraison)
+        SELECT 
+            r2_degu.id_delivery_guy, 
+            r2_degu.firstname,
+            r2_degu.lastname,
+            r2_vehi.id_vehicle,
+            r2_vehi.label,
+            r2_vehi.licence_plate,
+            COUNT(*) AS late_orders_nb
+        FROM deliveryguys 	AS r2_degu 
+        JOIN orders 		AS r2_orde		ON r2_orde.id_delivery_guy = r2_degu.id_delivery_guy 	
+        JOIN vehicles 		AS r2_vehi      ON r2_orde.id_vehicle      = r2_vehi.id_vehicle
+        WHERE
+            DATEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) >= 1
+                OR
+            (
+                DATEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) = 0
+                    AND
+                TIMEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) >= "00:30:00"
+            )
+        GROUP BY r2_degu.id_delivery_guy
+    	ORDER BY COUNT(*) DESC
+        LIMIT 1;
+
+    -- Identification de l’ingrédient favori
+    SELECT 
+        *,
+        COUNT(*) AS order_nb
+    FROM ingredients 	AS ingr 
+    JOIN composing 		AS comp 	ON comp.id_ingredient = ingr.id_ingredient
+    JOIN pizzas			AS pizz  	ON pizz.id_pizza      = comp.id_pizza
+    JOIN orders			AS orde		ON orde.id_pizza      = pizz.id_pizza
+    GROUP BY ingr.id_ingredient
+    ORDER BY COUNT(*) DESC
+    LIMIT 1;
+
+    
