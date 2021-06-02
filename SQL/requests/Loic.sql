@@ -75,3 +75,81 @@ SET
     )
 WHERE
     acco.id_client = 1; -- => $clientId
+
+
+-- Vehicules libres
+SELECT
+    vehi.licence_plate,
+    vehi.label
+FROM
+    orders orde
+INNER JOIN vehicles vehi ON
+    orde.id_vehicle = vehi.id_vehicle
+WHERE
+    orde.id_vehicle NOT IN(
+    SELECT
+        vehi.id_vehicle
+    FROM
+        orders orde
+    INNER JOIN vehicles vehi ON
+        orde.id_vehicle = vehi.id_vehicle
+    WHERE
+        orde.delivry_timestamp IS NULL
+    GROUP BY
+        vehi.id_vehicle
+)
+GROUP BY
+    vehi.id_vehicle;
+
+
+
+-- Livreurs libres
+SELECT
+    deli.*
+FROM
+    orders orde
+INNER JOIN deliveryguys deli ON
+    orde.id_delivery_guy = deli.id_delivery_guy
+WHERE
+    orde.id_delivery_guy NOT IN(
+    SELECT
+        deli.id_delivery_guy
+    FROM
+        orders orde
+    INNER JOIN deliveryguys deli ON
+        orde.id_delivery_guy = deli.id_delivery_guy
+    WHERE
+        orde.delivry_timestamp IS NULL
+    GROUP BY
+        deli.id_delivery_guy
+)
+GROUP BY
+    deli.id_delivery_guy;
+
+-- Insert Order
+INSERT INTO `orders`(
+    `id_order`,
+    `order_timestamp`,
+    `delivry_timestamp`,
+    `id_size`,
+    `id_vehicle`,
+    `id_client`,
+    `id_delivery_guy`,
+    `id_pizza`
+)
+VALUES(
+    NULL,
+    NOW(), 
+    NULL, 
+    id_size, 
+    id_vehicle, 
+    id_client, 
+    id_delivery_guy,
+    id_pizza
+);
+
+
+
+
+
+
