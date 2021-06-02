@@ -12,10 +12,16 @@ public class Vehicle {
 		this.label = label;
 		this.type = type;
 	}
+
+
+	public String getType() {
+		// TODO Auto-generated method stub
+		return type;
+	}
 	
-	@Override
-	public String toString() {
+	public String getLabel() {
 		// TODO Auto-generated method stub
 		return label;
 	}
+	
 }

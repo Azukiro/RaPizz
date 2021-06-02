@@ -15,9 +15,12 @@ public class DeliveryGuy {
 		this.phone = phone;
 	}
 	
-	@Override
-	public String toString() {
-		// TODO Auto-generated method stub
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public String getLastName() {
 		return lastName;
 	}
 	

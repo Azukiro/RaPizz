@@ -16,6 +16,15 @@ public class Client {
 		this.phone = phone;
 		this.adress = adress;
 	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+	
 	
 	@Override
 	public String toString() {

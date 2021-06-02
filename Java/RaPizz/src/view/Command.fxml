@@ -4,39 +4,24 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="349.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controler.CommandControler">
-   <center>
-      <GridPane BorderPane.alignment="CENTER" fx:id="gp_pizzas">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-      </GridPane>
-   </center>
    <bottom>
       <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="BOTTOM_RIGHT">
          <children>
             <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                <children>
                   <Label text="Livreur" />
-                  <ListView prefHeight="83.0" prefWidth="220.0" fx:id="lv_delivryguys" />
+                  <ListView fx:id="lv_delivryguys" prefHeight="83.0" prefWidth="220.0" />
                </children>
             </VBox>
             <VBox prefHeight="100.0" prefWidth="150.0" HBox.hgrow="ALWAYS">
                <children>
                   <Label text="Vehicle" />
-                  <ListView prefHeight="83.0" prefWidth="252.0" fx:id="lv_vehicles"/>
+                  <ListView fx:id="lv_vehicles" prefHeight="83.0" prefWidth="252.0" />
                </children>
             </VBox>
             <Button alignment="CENTER" contentDisplay="TOP" mnemonicParsing="false" prefHeight="43.0" prefWidth="127.0" text="Pass Command" />
@@ -47,8 +32,11 @@
       <VBox prefHeight="249.0" prefWidth="151.0" BorderPane.alignment="CENTER">
          <children>
             <Label text="Client" />
-            <ListView prefHeight="225.0" prefWidth="100.0" fx:id="lv_clients" />
+            <ListView fx:id="lv_clients" prefHeight="225.0" prefWidth="100.0" />
          </children>
       </VBox>
    </left>
+   <center>
+      <FlowPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" fx:id="fp_pizzas" />
+   </center>
 </BorderPane>

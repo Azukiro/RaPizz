@@ -2,6 +2,8 @@ package model;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
 
+
+
 import javax.naming.Context;
 import java.io.IOException;
 import java.sql.*;
@@ -125,6 +127,34 @@ public class SQLManager{
          int i = pStatement.executeUpdate();
         
     }
+
+	public ArrayList<Vehicle> getVehicles() {
+		// TODO Auto-generated method stub
+		var result = new ArrayList<Vehicle>() ;
+		result.add(new Vehicle(0, "Clio", "Voiture"));
+		result.add(new Vehicle(0, "T-Max", "Scooter"));
+		result.add(new Vehicle(0, "Clio", "Voiture"));
+		result.add(new Vehicle(0, "T-Max", "Scooter"));
+		result.add(new Vehicle(0, "Clio", "Voiture"));
+		result.add(new Vehicle(0, "T-Max", "Scooter"));
+		return result;
+	}
+	
+	public ArrayList<Client> getClients() {
+		// TODO Auto-generated method stub
+		var result = new ArrayList<Client>() ;
+		result.add(new Client(0, "Clio", "Voiture", "0651096591","128 avenue du caca"));
+		result.add(new Client(1, "Clio2", "Voiture3", "0651096591","128 avenue du caca"));
+		return result;
+	}
+
+	public ArrayList<DeliveryGuy> getDeliveryGuys() {
+		// TODO Auto-generated method stub
+		var result = new ArrayList<DeliveryGuy>() ;
+		result.add(new DeliveryGuy(0, "Mustang", "Ford", "0651096591"));
+		result.add(new DeliveryGuy(1, "Citroen", "Mercedes", "0651096591"));
+		return result;
+	}
 
 
 }
