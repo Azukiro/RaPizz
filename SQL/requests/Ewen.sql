@@ -27,7 +27,9 @@
         SELECT 
             pizz.id_pizza,
             pizz.label,
-            pizz.price
+            pizz.price,
+            ingr.id_ingredient,
+            ingr.label
         FROM pizzas         AS pizz
         JOIN composing      AS comp     ON comp.id_pizza       = pizz.id_pizza
         JOIN ingredients    AS ingr     ON comp.id_ingredient  = ingr.id_ingredient;
