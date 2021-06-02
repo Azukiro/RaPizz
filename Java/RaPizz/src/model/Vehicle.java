@@ -24,4 +24,10 @@ public class Vehicle {
 		return label;
 	}
 	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return label;
+	}
+	
 }

@@ -24,4 +24,10 @@ public class DeliveryGuy {
 		return lastName;
 	}
 	
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return lastName;
+	}
 }

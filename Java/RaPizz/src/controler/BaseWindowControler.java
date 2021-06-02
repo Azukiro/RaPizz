@@ -30,8 +30,8 @@ public class BaseWindowControler {
     }
 
     @FXML
-    void switchToStatisticsWindow(ActionEvent event) {
-    	
+    void switchToStatisticsWindow(ActionEvent event) throws IOException {
+    	MainView.changeScene((Stage)orderHistoryWindowButton.getScene().getWindow(), "Statistics.fxml");
     }
 
 }
