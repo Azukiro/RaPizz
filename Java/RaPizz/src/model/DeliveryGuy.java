@@ -7,6 +7,11 @@ public class DeliveryGuy {
 	private final String lastName;
 	private final String phone;
 	
+	public DeliveryGuy(int id, String firstName, String lastName) {
+		this(id, firstName, lastName, null);
+	}
+	
+	
 	public DeliveryGuy(int id, String firstName, String lastName, String phone) {
 		super();
 		this.id = id;
@@ -71,6 +76,11 @@ public class DeliveryGuy {
 	public String toString() {
 		// TODO Auto-generated method stub
 		return firstName+" "+lastName;
+	}
+	
+	public int getId() {
+		// TODO Auto-generated method stub
+		return id;
 	}
 	
 }

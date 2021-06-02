@@ -10,8 +10,9 @@
 
 -- Interrogation de la base de données
 
-    -- 1) Menu
-        SELECT 
+    -- 1) Menu 
+    -- public Collection<Pizza> getPizzas()
+    /*    SELECT 
             pizz.id_pizza,
             pizz.label,
             (
@@ -21,7 +22,7 @@
                 JOIN ingredients    AS ingr     ON comp.id_ingredient = ingr.id_ingredient
                 WHERE comp.id_pizza = pizz.id_pizza
             )
-        FROM pizzas         AS pizz;
+        FROM pizzas         AS pizz; */
 
         -- ou
         SELECT 
@@ -36,6 +37,7 @@
 
     -- 3) Questions diverses    
     -- Quels sont les véhicules n’ayant jamais servi ?
+    -- public ArrayList<Vehicle> uselessVehicles()
         SELECT 
             DISTINCT(vehi.id_vehicle),
             vehi.label
@@ -45,6 +47,7 @@
         GROUP BY vehi.id_vehicle;
 
     -- Calcul du nombre de commandes par client ?
+    -- public ArrayList<Vehicle> uselessVehicles()
         SELECT 
             clien.id_client,
             clien.firstname,
@@ -55,6 +58,7 @@
         GROUP BY clien.id_client;
 
     -- Calcul de la moyenne des commandes ?
+    -- public double getAvgCommand()
         SELECT
             AVG(pizz.price * size.multiplicator)
         FROM orders             AS orde
@@ -63,6 +67,7 @@
 
 
     -- Extraction des clients ayant commandé plus que la moyenne ?
+    -- public ArrayList<Client> clientsCommandMoreThanAvg()
         SELECT
             r1_clien.id_client,
             r1_clien.firstname,
@@ -89,19 +94,19 @@
 -- Objectifs du système
 
     -- Suivi du chiffre d’affaires
-    (
-        -- Order price
-        SELECT
-            DATE_FORMAT(orde.delivry_timestamp, "%Y/%d"),
-            SUM(pizz.price * pisi.multiplicator) AS turnover 
-        FROM orders         AS orde
-        JOIN pizzas         AS pizz     ON pizz.id_pizza = orde.id_pizza
-        JOIN pizzasizes     AS pisi     ON pisi.id_size  = orde.id_size
-        GROUP BY DATE_FORMAT(orde.delivry_timestamp, "%Y/%d")
-    );
+    -- public Map<String,Double> getTurnoverByMonth()
+    SELECT
+        DATE_FORMAT(orde.delivry_timestamp, "%Y/%d"),
+        SUM(pizz.price * pisi.multiplicator) AS turnover 
+    FROM orders         AS orde
+    JOIN pizzas         AS pizz     ON pizz.id_pizza = orde.id_pizza
+    JOIN pizzasizes     AS pisi     ON pisi.id_size  = orde.id_size
+    GROUP BY DATE_FORMAT(orde.delivry_timestamp, "%Y/%d");
+    
 
     -- Refus d’honorer les commandes pour lesquelles le solde du compte client est insuffisant ;
     -- => $orderId, $accountId
+    -- public boolean canPay(int orderId, int accountId)
     SELECT 
         0 <= (
             (
@@ -127,6 +132,7 @@
 
     -- Non-facturation des pizzas gratuites (retard ou fidélité)
     -- => $orderId, $clientId
+    --public boolean isFreePizza(int orderId, int clientId)
     SELECT
         (
             (
@@ -160,6 +166,7 @@
         
 
     --  Identification du plus mauvais livreur et de la voiture utilisée (nombre de retards dans la livraison)
+    -- public Map<DeliveryGuy,Vehicle> worthDeliveryGuy()
         SELECT 
             r2_degu.id_delivery_guy, 
             r2_degu.firstname,
@@ -184,6 +191,7 @@
         LIMIT 1;
 
     -- Identification de l’ingrédient favori
+    -- public Ingredient favoriteIngredient()
     SELECT 
         *,
         COUNT(*) AS order_nb

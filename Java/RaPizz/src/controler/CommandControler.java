@@ -54,7 +54,7 @@ public class CommandControler {
 	                    public void updateItem(Vehicle item, boolean empty) {
 	                        super.updateItem(item, empty);
 	                        if (item != null) {
-	                            setText(item.getLabel()+" ["+item.getType()+"]");
+	                            setText(item.getLabel()+" ["+item.getPlate()+"]");
 	                        }
 	                    }
 	                };

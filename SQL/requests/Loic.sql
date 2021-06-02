@@ -127,6 +127,7 @@ GROUP BY
     deli.id_delivery_guy;
 
 -- Insert Order
+-- public boolean insertOrder(Pizza pizza, Client client, Vehicle vehicle, DeliveryGuy deliveryGuy,PizzaSize size)
 INSERT INTO `orders`(
     `id_order`,
     `order_timestamp`,

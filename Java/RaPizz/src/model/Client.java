@@ -84,4 +84,9 @@ public class Client {
 		return firstName+" "+lastName;
 	}
 	
+	public int getId() {
+		// TODO Auto-generated method stub
+		return id;
+	}
+	
 }

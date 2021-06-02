@@ -76,4 +76,9 @@ public class Pizza {
 		// TODO Auto-generated method stub
 		return label;
 	}
+	
+	public int getId() {
+		// TODO Auto-generated method stub
+		return id;
+	}
 }

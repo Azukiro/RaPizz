@@ -159,7 +159,8 @@ public class SQLManager{
 	}
 	
 	public Collection<Pizza> getPizzas() throws SQLException {
-		String requestString = "SELECT \r\n"
+		return new ArrayList<Pizza>();
+		/*String requestString = "SELECT \r\n"
 				+ "            pizz.id_pizza,\r\n"
 				+ "            pizz.label,\r\n"
 				+ "            pizz.price,\r\n"
@@ -193,7 +194,7 @@ public class SQLManager{
         }
 
         
-		return mapPizzas.values();
+		return mapPizzas.values();*/
 	}
 
 	public ArrayList<Vehicle> uselessVehicles() throws SQLException{
@@ -256,9 +257,9 @@ public class SQLManager{
 		PreparedStatement pStatement = getCon().prepareStatement(requestString);
 
         ResultSet rSet = pStatement.executeQuery();
-        int result = 0;
+        double result = 0;
         if(rSet.next()) {
-        	result = rSet.getInt(1);
+        	result = rSet.getDouble(1);
         	
         }
         return result;
@@ -303,10 +304,200 @@ public class SQLManager{
         
 	}
 	
+	public Map<String,Double> getTurnoverByMonth() throws SQLException{
+		String requestString = "SELECT\r\n"
+				+ "        DATE_FORMAT(orde.delivry_timestamp, \"%Y/%d\"),\r\n"
+				+ "        SUM(pizz.price * pisi.multiplicator) AS turnover \r\n"
+				+ "    FROM orders         AS orde\r\n"
+				+ "    JOIN pizzas         AS pizz     ON pizz.id_pizza = orde.id_pizza\r\n"
+				+ "    JOIN pizzasizes     AS pisi     ON pisi.id_size  = orde.id_size\r\n"
+				+ "    GROUP BY DATE_FORMAT(orde.delivry_timestamp, \"%Y/%d\");";
+		
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+        ResultSet rSet = pStatement.executeQuery();
+        var result = new HashMap<String, Double>();
+        while(rSet.next()) {
+        	String month = rSet.getNString(1);
+        	double price  = rSet.getDouble(2);
+        	result.put(month,price);
+        	
+        }
+        return result;
+	}
+	
+	public boolean canPay(int orderId, int accountId) throws SQLException {
+		String requestString = " SELECT \r\n"
+				+ "        0 <= (\r\n"
+				+ "            (\r\n"
+				+ "                -- Client account\r\n"
+				+ "                SELECT\r\n"
+				+ "                    acco.account_balance\r\n"
+				+ "                FROM account AS acco\r\n"
+				+ "                WHERE  \r\n"
+				+ "                    acco.id_client = ?\r\n"
+				+ "            )\r\n"
+				+ "                -\r\n"
+				+ "            (\r\n"
+				+ "                -- Order price\r\n"
+				+ "                SELECT\r\n"
+				+ "                    pizz.price * pisi.multiplicator AS price\r\n"
+				+ "                FROM orders         AS orde\r\n"
+				+ "                JOIN pizzas         AS pizz     ON pizz.id_pizza = orde.id_pizza\r\n"
+				+ "                JOIN pizzasizes     AS pisi     ON pisi.id_size  = orde.id_size\r\n"
+				+ "                WHERE  \r\n"
+				+ "                    orde.id_order = ?\r\n"
+				+ "            )\r\n"
+				+ "        ) AS can_buy;";
+		
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+		pStatement.setInt(1, accountId);
+		pStatement.setInt(2, orderId);
+        ResultSet rSet = pStatement.executeQuery();
+        boolean result = false;
+        if(rSet.next()) {
+        
+        	result = rSet.getBoolean(1);
+        	
+        }
+        return result;
+	}
+	
+	public boolean isFreePizza(int orderId, int clientId) throws SQLException {
+		String requestString = "  SELECT\r\n"
+				+ "        (\r\n"
+				+ "            (\r\n"
+				+ "                -- Free 10 pizza\r\n"
+				+ "                SELECT\r\n"
+				+ "                    (\r\n"
+				+ "                        COUNT(r2_orde.id_order) % 10\r\n"
+				+ "                    ) = 0 AS free_10_pizza\r\n"
+				+ "                FROM orders             AS r2_orde\r\n"
+				+ "                WHERE \r\n"
+				+ "                    r2_orde.id_client = ?\r\n"
+				+ "            )\r\n"
+				+ "                OR\r\n"
+				+ "            (\r\n"
+				+ "                -- Free late pizza\r\n"
+				+ "                SELECT\r\n"
+				+ "                    (\r\n"
+				+ "                        DATEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) >= 1\r\n"
+				+ "                            OR\r\n"
+				+ "                        (\r\n"
+				+ "                            DATEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) = 0\r\n"
+				+ "                                AND\r\n"
+				+ "                            TIMEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) >= \"00:30:00\"\r\n"
+				+ "                        )\r\n"
+				+ "                    ) AS late_order\r\n"
+				+ "                FROM orders             AS r2_orde\r\n"
+				+ "                WHERE \r\n"
+				+ "                    r2_orde.id_order = ?\r\n"
+				+ "            )\r\n"
+				+ "        ) AS is_pizza_free;";
+		
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+		pStatement.setInt(1, clientId);
+		pStatement.setInt(2, orderId);
+        ResultSet rSet = pStatement.executeQuery();
+        boolean result = false;
+        if(rSet.next()) {
+        
+        	result = rSet.getBoolean(1);
+        	
+        }
+        return result;
+	}
+	
+	public Map<DeliveryGuy,Vehicle> worthDeliveryGuy() throws SQLException {
+		String requestString = " SELECT \r\n"
+				+ "            r2_degu.id_delivery_guy, \r\n"
+				+ "            r2_degu.firstname,\r\n"
+				+ "            r2_degu.lastname,\r\n"
+				+ "            r2_vehi.id_vehicle,\r\n"
+				+ "            r2_vehi.label,\r\n"
+				+ "            r2_vehi.licence_plate,\r\n"
+				+ "            COUNT(*) AS late_orders_nb\r\n"
+				+ "        FROM deliveryguys 	AS r2_degu \r\n"
+				+ "        JOIN orders 		AS r2_orde		ON r2_orde.id_delivery_guy = r2_degu.id_delivery_guy 	\r\n"
+				+ "        JOIN vehicles 		AS r2_vehi      ON r2_orde.id_vehicle      = r2_vehi.id_vehicle\r\n"
+				+ "        WHERE\r\n"
+				+ "            DATEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) >= 1\r\n"
+				+ "                OR\r\n"
+				+ "            (\r\n"
+				+ "                DATEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) = 0\r\n"
+				+ "                    AND\r\n"
+				+ "                TIMEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) >= \"00:30:00\"\r\n"
+				+ "            )\r\n"
+				+ "        GROUP BY r2_degu.id_delivery_guy\r\n"
+				+ "    	ORDER BY COUNT(*) DESC\r\n"
+				+ "        LIMIT 1;";
+		
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+        ResultSet rSet = pStatement.executeQuery();
+        var result = new HashMap<DeliveryGuy,Vehicle>();
+        if(rSet.next()) {
+        
+        	DeliveryGuy guy = new DeliveryGuy(rSet.getInt(1),rSet.getNString(2),rSet.getNString(3));
+        	Vehicle vehicle = new Vehicle(rSet.getInt(1),rSet.getNString(2),rSet.getNString(3));
+        	result.put(guy,vehicle);
+        	
+        }
+        return result;
+	}
+	
+	public Ingredient favoriteIngredient() throws SQLException {
+		String requestString = " SELECT \r\n"
+				+ "        *,\r\n"
+				+ "        COUNT(*) AS order_nb\r\n"
+				+ "    FROM ingredients 	AS ingr \r\n"
+				+ "    JOIN composing 		AS comp 	ON comp.id_ingredient = ingr.id_ingredient\r\n"
+				+ "    JOIN pizzas			AS pizz  	ON pizz.id_pizza      = comp.id_pizza\r\n"
+				+ "    JOIN orders			AS orde		ON orde.id_pizza      = pizz.id_pizza\r\n"
+				+ "    GROUP BY ingr.id_ingredient\r\n"
+				+ "    ORDER BY COUNT(*) DESC\r\n"
+				+ "    LIMIT 1;";
+		
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+        ResultSet rSet = pStatement.executeQuery();
+        Ingredient result = null;
+        if(rSet.next()) {
+        
+        	result = new Ingredient(rSet.getInt(1),rSet.getNString(2));
+        	
+        }
+        return result;
+	}
 	
 	
-	public void insertOrder(Pizza pizza, Client client, Vehicle vehicle, DeliveryGuy deliveryGuy) {
-		System.out.println("Test");
+	public boolean insertOrder(Pizza pizza, Client client, Vehicle vehicle, DeliveryGuy deliveryGuy,PizzaSize size) throws SQLException {
+		final String request =  "INSERT INTO `orders`(\r\n"
+				+ "    `id_order`,\r\n"
+				+ "    `order_timestamp`,\r\n"
+				+ "    `delivry_timestamp`,\r\n"
+				+ "    `id_size`,\r\n"
+				+ "    `id_vehicle`,\r\n"
+				+ "    `id_client`,\r\n"
+				+ "    `id_delivery_guy`,\r\n"
+				+ "    `id_pizza`\r\n"
+				+ ")\r\n"
+				+ "VALUES(\r\n"
+				+ "    NULL,\r\n"
+				+ "    NOW(), \r\n"
+				+ "    NULL, \r\n"
+				+ "    ?, \r\n"
+				+ "    ?, \r\n"
+				+ "    ?, \r\n"
+				+ "    ?,\r\n"
+				+ "    ?\r\n"
+				+ ");";
+	        	
+	        PreparedStatement s = getCon().prepareStatement(request);
+	        s.setInt(1, size.getId());
+	        s.setInt(2, vehicle.getId());
+	        s.setInt(3, client.getId());
+	        s.setInt(4, deliveryGuy.getId());
+	        s.setInt(5, pizza.getId());
+	        return !s.execute();
 		
 	}
 

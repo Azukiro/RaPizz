@@ -39,5 +39,8 @@ public class Ingredient {
 		return true;
 	}
 	
-	
+	public int getId() {
+		// TODO Auto-generated method stub
+		return id;
+	}
 }
