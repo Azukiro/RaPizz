@@ -14,29 +14,32 @@
          <children>
             <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                <children>
-                  <Label text="Livreur" />
+                  <Label text="Livreurs" />
                   <ListView fx:id="lv_delivryguys" prefHeight="83.0" prefWidth="220.0" />
                </children>
             </VBox>
             <VBox prefHeight="100.0" prefWidth="150.0" HBox.hgrow="ALWAYS">
                <children>
-                  <Label text="Vehicle" />
+                  <Label text="Véhicules" />
                   <ListView fx:id="lv_vehicles" prefHeight="83.0" prefWidth="252.0" />
                </children>
             </VBox>
-            <Button alignment="CENTER" contentDisplay="TOP" mnemonicParsing="false" prefHeight="43.0" prefWidth="127.0" text="Pass Command" />
+            <Button alignment="CENTER" contentDisplay="TOP" mnemonicParsing="false" prefHeight="43.0" prefWidth="127.0" text="Commander" fx:id="bt_command" />
          </children>
       </HBox>
    </bottom>
    <left>
       <VBox prefHeight="249.0" prefWidth="151.0" BorderPane.alignment="CENTER">
          <children>
-            <Label text="Client" />
+            <Label text="Clients" />
             <ListView fx:id="lv_clients" prefHeight="225.0" prefWidth="100.0" />
          </children>
       </VBox>
    </left>
    <center>
-      <FlowPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" fx:id="fp_pizzas" />
+       <VBox>
+       	  <Label text="Pizzas"/>
+    	  <FlowPane fx:id="fp_pizzas" hgap="4.0" prefHeight="200.0" prefWidth="200.0" vgap="4.0" BorderPane.alignment="CENTER" />
+	   </VBox>
    </center>
 </BorderPane>

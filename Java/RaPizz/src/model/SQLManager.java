@@ -155,6 +155,38 @@ public class SQLManager{
 		result.add(new DeliveryGuy(1, "Citroen", "Mercedes", "0651096591"));
 		return result;
 	}
+	
+	public ArrayList<Pizza> getPizzas() {
+		// TODO Auto-generated method stub
+		var result = new ArrayList<Pizza>() ;
+		var ingre = new ArrayList<Ingredient>() ;
+		ingre.add(new Ingredient(0, "Saucisse"));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));result.add(new Pizza(0, "Mustang", ingre, 2));result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));result.add(new Pizza(0, "Mustang", ingre, 2));result.add(new Pizza(0, "Mustang", ingre, 2));result.add(new Pizza(0, "Mustang", ingre, 2));result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		result.add(new Pizza(0, "Mustang", ingre, 2));
+		return result;
+	}
+
+	public void insertOrder(Pizza pizza, Client client, Vehicle vehicle, DeliveryGuy deliveryGuy) {
+		System.out.println("Test");
+		
+	}
 
 
 }

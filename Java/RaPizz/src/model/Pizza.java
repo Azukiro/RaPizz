@@ -17,8 +17,8 @@ public class Pizza {
 		this.price = price;
 	}
 	
-	@Override
-	public String toString() {
+	
+	public String getLabel() {
 		// TODO Auto-generated method stub
 		return label;
 	}
