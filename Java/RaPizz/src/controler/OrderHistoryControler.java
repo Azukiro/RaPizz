@@ -5,13 +5,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.ResourceBundle;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Callback;
 import model.Client;
 import model.DeliveryGuy;
 import model.Order;
@@ -49,7 +53,7 @@ public class OrderHistoryControler implements Initializable{
     	numCol.setCellValueFactory(new PropertyValueFactory<>("id"));
     	orderTimeCol.setCellValueFactory(new PropertyValueFactory<>("orderTime"));
     	deliveryTimeCol.setCellValueFactory(new PropertyValueFactory<>("deliveryTime"));
-    	clientNameCol.setCellValueFactory(new PropertyValueFactory<>("client"));
+    	clientNameCol.setCellValueFactory(new PropertyValueFactory<>("client"));    	
     	deliveryGuyCol.setCellValueFactory(new PropertyValueFactory<>("deliveryGuy"));
     	pizzaCol.setCellValueFactory(new PropertyValueFactory<>("pizza"));
     	vehicleCol.setCellValueFactory(new PropertyValueFactory<>("vehicle"));

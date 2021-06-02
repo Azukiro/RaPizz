@@ -2,6 +2,7 @@ package controler;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -112,7 +113,7 @@ public class CommandControler {
 	    );
 		
 		//init flowpane of Pizzas
-		ArrayList<Pizza> pizzas = SQLManager.getInstance().getPizzas();
+		Collection<Pizza> pizzas = SQLManager.getInstance().getPizzas();
 		ToggleGroup group = new ToggleGroup();
 		for (Pizza pizza : pizzas) {
 			RadioButton rectangle = new RadioButton(pizza.getLabel());

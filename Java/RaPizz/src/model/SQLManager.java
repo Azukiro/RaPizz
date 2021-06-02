@@ -129,6 +129,8 @@ public class SQLManager{
     }
 
 	public ArrayList<Vehicle> getVehicles() {
+		
+		
 		// TODO Auto-generated method stub
 		var result = new ArrayList<Vehicle>() ;
 		result.add(new Vehicle(0, "Clio", "Voiture"));
@@ -156,33 +158,153 @@ public class SQLManager{
 		return result;
 	}
 	
-	public ArrayList<Pizza> getPizzas() {
-		// TODO Auto-generated method stub
-		var result = new ArrayList<Pizza>() ;
-		var ingre = new ArrayList<Ingredient>() ;
-		ingre.add(new Ingredient(0, "Saucisse"));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));result.add(new Pizza(0, "Mustang", ingre, 2));result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));result.add(new Pizza(0, "Mustang", ingre, 2));result.add(new Pizza(0, "Mustang", ingre, 2));result.add(new Pizza(0, "Mustang", ingre, 2));result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		result.add(new Pizza(0, "Mustang", ingre, 2));
-		return result;
+	public Collection<Pizza> getPizzas() throws SQLException {
+		String requestString = "SELECT \r\n"
+				+ "            pizz.id_pizza,\r\n"
+				+ "            pizz.label,\r\n"
+				+ "            pizz.price,\r\n"
+				+ "            ingr.id_ingredient,\r\n"
+				+ "            ingr.label\r\n"
+				+ "        FROM pizzas         AS pizz\r\n"
+				+ "        JOIN composing      AS comp     ON comp.id_pizza       = pizz.id_pizza\r\n"
+				+ "        JOIN ingredients    AS ingr     ON comp.id_ingredient  = ingr.id_ingredient;\r\n";
+		
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+        
+
+        ResultSet rSet = pStatement.executeQuery();
+        Map<Integer, Pizza> mapPizzas = new HashMap<Integer, Pizza> ();
+        Map<Integer, Ingredient> mapiIngredients = new HashMap<Integer, Ingredient> ();
+        
+        while(rSet.next()) {
+        	int id_pizza = rSet.getInt(1);
+        	String labelPizza = rSet.getNString(2);
+        	double prix = rSet.getDouble(3);
+        	int id_ingredient = rSet.getInt(4);
+        	String labelIngredient = rSet.getNString(5);
+        	if(!mapiIngredients.containsKey(id_pizza)) {
+        		mapiIngredients.put(id_ingredient, new Ingredient(id_ingredient, labelIngredient));
+        	}
+        	if(!mapPizzas.containsKey(id_pizza)) {
+        		mapPizzas.put(id_ingredient, new Pizza(id_pizza, labelPizza,prix));
+        	}
+        	mapPizzas.get(id_pizza).addIngredient(mapiIngredients.get(id_ingredient));
+        	
+        }
+
+        
+		return mapPizzas.values();
 	}
 
+	public ArrayList<Vehicle> uselessVehicles() throws SQLException{
+		String requestString = "SELECT \r\n"
+				+ "            DISTINCT(vehi.id_vehicle),\r\n"
+				+ "            vehi.label\r\n"
+				+ "        FROM vehicles           AS vehi     \r\n"
+				+ "        LEFT JOIN orders        AS orde     ON orde.id_vehicle = vehi.id_vehicle\r\n"
+				+ "        WHERE orde.id_vehicle IS NULL\r\n"
+				+ "        GROUP BY vehi.id_vehicle;";
+
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+        ResultSet rSet = pStatement.executeQuery();
+        var result = new ArrayList<Vehicle>();
+        
+        while(rSet.next()) {
+        	int id = rSet.getInt(1);
+        	String label = rSet.getNString(2);
+        	result.add(new Vehicle(id, label));
+        }
+        
+        return result;
+        
+	}
+	
+	public Map<Client, Integer> nbCommandPerClient() throws SQLException{
+		String requestString = "SELECT \r\n"
+				+ "            clien.id_client,\r\n"
+				+ "            clien.firstname,\r\n"
+				+ "            clien.lastname,\r\n"
+				+ "            COUNT(orde.id_order) AS `orders_nb`\r\n"
+				+ "        FROM clients            AS clien     \r\n"
+				+ "        JOIN orders             AS orde     ON orde.id_client = clien.id_client\r\n"
+				+ "        GROUP BY clien.id_client;";
+		
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+        ResultSet rSet = pStatement.executeQuery();
+        var result = new HashMap<Client, Integer>();
+        
+        while(rSet.next()) {
+        	int id = rSet.getInt(1);
+        	String firstname = rSet.getNString(2);
+        	String lastname = rSet.getNString(3);
+        	int count = rSet.getInt(4);
+        	result.put(new Client(id, firstname, lastname), count);
+        }
+        return result;
+        
+	}
+	
+	public double getAvgCommand() throws SQLException {
+		String requestString = "  SELECT\r\n"
+				+ "            AVG(pizz.price * size.multiplicator)\r\n"
+				+ "        FROM orders             AS orde\r\n"
+				+ "        JOIN pizzas             AS pizz     ON orde.id_pizza = pizz.id_pizza\r\n"
+				+ "        JOIN pizzasizes              AS size     ON orde.id_size  = size.id_size;";
+		
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+        ResultSet rSet = pStatement.executeQuery();
+        int result = 0;
+        if(rSet.next()) {
+        	result = rSet.getInt(1);
+        	
+        }
+        return result;
+	}
+	
+	public ArrayList<Client> clientsCommandMoreThanAvg() throws SQLException{
+		String requestString = "SELECT\r\n"
+				+ "            r1_clien.id_client,\r\n"
+				+ "            r1_clien.firstname,\r\n"
+				+ "            r1_clien.lastname\r\n"
+				+ "        FROM clients            AS r1_clien\r\n"
+				+ "        WHERE \r\n"
+				+ "            EXISTS (\r\n"
+				+ "                SELECT r2_orde.id_order\r\n"
+				+ "                    FROM orders         AS r2_orde\r\n"
+				+ "                JOIN pizzas             AS r2_pizz     ON r2_orde.id_pizza   = r2_pizz.id_pizza\r\n"
+				+ "                JOIN pizzasizes              AS r2_size     ON r2_orde.id_size    = r2_size.id_size\r\n"
+				+ "                WHERE \r\n"
+				+ "                    r2_orde.id_client = r1_clien.id_client\r\n"
+				+ "                        AND\r\n"
+				+ "                    r2_pizz.price * r2_size.multiplicator > (\r\n"
+				+ "                        SELECT\r\n"
+				+ "                            AVG(r3_pizz.price * r3_size.multiplicator)\r\n"
+				+ "                        FROM orders             AS r3_orde\r\n"
+				+ "                        JOIN pizzas             AS r3_pizz     ON r3_orde.id_pizza = r3_pizz.id_pizza\r\n"
+				+ "                        JOIN pizzasizes         AS r3_size     ON r3_orde.id_size  = r3_size.id_size\r\n"
+				+ "                    )\r\n"
+				+ "            )";
+		
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+        ResultSet rSet = pStatement.executeQuery();
+        var result = new ArrayList<Client>();
+        
+        while(rSet.next()) {
+        	int id = rSet.getInt(1);
+        	String firstname = rSet.getNString(2);
+        	String lastname = rSet.getNString(3);
+        	result.add(new Client(id, firstname, lastname));
+        }
+        return result;
+        
+	}
+	
+	
+	
 	public void insertOrder(Pizza pizza, Client client, Vehicle vehicle, DeliveryGuy deliveryGuy) {
 		System.out.println("Test");
 		
