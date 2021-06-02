@@ -2,8 +2,9 @@ package application;
 
 import java.sql.*;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
-import models.SQLManager;
+import model.SQLManager;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 
@@ -12,8 +13,14 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			BorderPane root = new BorderPane();
-			Scene scene = new Scene(root,400,400);
+			primaryStage.setTitle("RaPizz");
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(Main.class.getResource("../view/base_window.fxml"));
+			FXMLLoader loader2 = new FXMLLoader();
+			loader2.setLocation(Main.class.getResource("../view/Command.fxml"));
+			BorderPane root = (BorderPane) loader.load();
+			root.setCenter((BorderPane) loader2.load());
+			Scene scene = new Scene(root,600,400);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.show();
@@ -23,26 +30,7 @@ public class Main extends Application {
 	}
 	
 	public static void main(String[] args) {  
-		try {
-			SQLManager.getInstance().testSelect();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
-		try{  
-			Class.forName("com.mysql.cj.jdbc.Driver");  
-			Connection con=DriverManager.getConnection(  
-			"jdbc:mysql://localhost:3306/tp5","root","");  
-			//here sonoo is database name, root is username and password  
-			Statement stmt=con.createStatement();  
-			ResultSet rs=stmt.executeQuery("select * from types");  
-			while(rs.next())  
-			System.out.println(rs.getInt(1)+"  "+rs.getString(2));  
-			con.close();  
-		}catch(Exception e){ 
-			System.out.println(e);
-		}  
 		
 		
 		launch(args);
