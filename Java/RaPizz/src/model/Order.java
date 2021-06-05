@@ -9,13 +9,14 @@ public class Order {
 	private Client client;
 	private DeliveryGuy deliveryGuy;
 	private Vehicle vehicle;
+	private PizzaSize size;
 	private Date orderTime;
 	private  Date deliveryTime;
 	
 	public Order() 
 	{}
 	
-	public Order(int id, Pizza pizza, Client client, DeliveryGuy deliveryGuy, Vehicle vehicle, Date orderTime,
+	public Order(int id, Pizza pizza, Client client, DeliveryGuy deliveryGuy, Vehicle vehicle,PizzaSize size, Date orderTime,
 			Date deliveryTime) {
 		super();
 		this.id = id;
@@ -25,6 +26,7 @@ public class Order {
 		this.vehicle = vehicle;
 		this.orderTime = orderTime;
 		this.deliveryTime = deliveryTime;
+		this.size = size;
 	}
 
 	public int getId() {
@@ -43,6 +45,10 @@ public class Order {
 		return deliveryGuy;
 	}
 
+	public PizzaSize getSize() {
+		return size;
+	}
+	
 	public Vehicle getVehicle() {
 		return vehicle;
 	}

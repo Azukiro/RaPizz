@@ -17,6 +17,7 @@ import javafx.util.Callback;
 import model.Client;
 import model.DeliveryGuy;
 import model.Pizza;
+import model.PizzaSize;
 import model.SQLManager;
 import model.Vehicle;
 
@@ -33,6 +34,9 @@ public class CommandControler {
 	
 	@FXML
 	private ListView<Client> lv_clients;
+	
+	@FXML
+	private ListView<PizzaSize> lv_pizzaSizes;
 	
 	@FXML
 	private Button bt_command;
@@ -112,6 +116,31 @@ public class CommandControler {
 	        }
 	    );
 		
+		//Init PizzaSize
+		ArrayList<PizzaSize> pizzaSizes = SQLManager.getInstance().getPizzaSizes();
+		ObservableList<PizzaSize> obl_pizzaSizes = FXCollections.observableArrayList(pizzaSizes);
+		lv_pizzaSizes.setItems(obl_pizzaSizes);
+		
+		//Change cell visual
+		lv_pizzaSizes.setCellFactory((Callback<ListView<PizzaSize>, ListCell<PizzaSize>>) new Callback<ListView<PizzaSize>, ListCell<PizzaSize>>() {
+	            @Override 
+	            public ListCell<PizzaSize> call(ListView<PizzaSize> list) {
+	                ListCell<PizzaSize> cell = new ListCell<PizzaSize>() {
+	                    @Override
+	                    public void updateItem(PizzaSize item, boolean empty) {
+	                        super.updateItem(item, empty);
+	                        if (item != null) {
+	                            setText(item.toString());
+	                        }
+	                    }
+	                };
+	
+	                return cell;
+	            }
+	        }
+	    );
+		
+		
 		//init flowpane of Pizzas
 		Collection<Pizza> pizzas = SQLManager.getInstance().getPizzas();
 		ToggleGroup group = new ToggleGroup();
@@ -129,13 +158,14 @@ public class CommandControler {
 			Client client = lv_clients.getSelectionModel().getSelectedItem();
 			Vehicle vehicle =lv_vehicles.getSelectionModel().getSelectedItem();
 			DeliveryGuy deliveryGuy =lv_delivryguys.getSelectionModel().getSelectedItem();
+			PizzaSize size =lv_pizzaSizes.getSelectionModel().getSelectedItem();
 			//Check if all information are give 
 			if(pizza == null || client == null || vehicle ==null || deliveryGuy ==null) {
 				System.out.println("Tout les champs ne sont pas remplies");
 				return;
 			}else {
 				try {
-					SQLManager.getInstance().insertOrder(pizza, client, vehicle, deliveryGuy);
+					SQLManager.getInstance().insertOrder(pizza, client, vehicle, deliveryGuy,size);
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

@@ -127,6 +127,24 @@ public class SQLManager{
          int i = pStatement.executeUpdate();
         
     }
+    
+    public ArrayList<PizzaSize> getPizzaSizes() throws SQLException {
+		String requestString = "SELECT * FROM PizzaSize;";
+
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+        ResultSet rSet = pStatement.executeQuery();
+        var result = new ArrayList<PizzaSize>();
+        
+        while(rSet.next()) {
+        	int id = rSet.getInt(1);
+        	String label = rSet.getNString(2);
+        	result.add(new PizzaSize(id, label));
+        }
+        
+        return result;
+	}  
+    
 
 	public ArrayList<Vehicle> getVehicles() {
 		
@@ -500,6 +518,8 @@ public class SQLManager{
 	        return !s.execute();
 		
 	}
+
+	
 
 
 }
