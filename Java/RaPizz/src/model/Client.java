@@ -30,6 +30,10 @@ public class Client {
 		return lastName;
 	}
 	
+	public String getFullName() {
+		return getFirstName()+" "+getLastName();
+	}
+	
 	
 	
 	@Override

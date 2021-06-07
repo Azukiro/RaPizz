@@ -76,8 +76,8 @@ public class SQLManager{
         String libe = "";
         while(rSet.next()) {
         	libe = rSet.getNString(2);
-        	int prix = rSet.getInt("Prix");
-        	System.out.println(libe+ "  "+ prix);
+        	int price = rSet.getInt("price");
+        	System.out.println(libe+ "  "+ price);
         }
 
        
@@ -86,7 +86,7 @@ public class SQLManager{
     private boolean testInsert(int staffId, int patientId, String title, int type, String description, String file, boolean isDraft) throws SQLException {
         //String link=CreateDynamicLink(file,patientId,title);
         final String searchNewID = 
-        	"INSERT INTO acte (MedicalFolder_idFolder, Nom, DateDebut, DateFin, Responsable, Prix, DocumentLink, IsADraft, DocumentType_idDocumentType, Description, idActe)\r\n" +
+        	"INSERT INTO acte (MedicalFolder_idFolder, Nom, DateDebut, DateFin, Responsable, price, DocumentLink, IsADraft, DocumentType_idDocumentType, Description, idActe)\r\n" +
             "VALUES (?, ?, ?, NULL, ?, NULL, ?, ?, ?, ?, NULL);";
         PreparedStatement s = getCon().prepareStatement(searchNewID);
         s.setInt(1, patientId);
@@ -268,14 +268,14 @@ public class SQLManager{
         while(rSet.next()) {
         	int id_pizza = rSet.getInt(1);
         	String labelPizza = rSet.getNString(2);
-        	double prix = rSet.getDouble(3);
+        	double price = rSet.getDouble(3);
         	int id_ingredient = rSet.getInt(4);
         	String labelIngredient = rSet.getNString(5);
         	if(!mapiIngredients.containsKey(id_ingredient)) {
         		mapiIngredients.put(id_ingredient, new Ingredient(id_ingredient, labelIngredient));
         	}
         	if(!mapPizzas.containsKey(id_pizza)) {
-        		mapPizzas.put(id_pizza, new Pizza(id_pizza, labelPizza,prix));
+        		mapPizzas.put(id_pizza, new Pizza(id_pizza, labelPizza,price));
         	}
         	mapPizzas.get(id_pizza).addIngredient(mapiIngredients.get(id_ingredient));
         	
@@ -309,7 +309,7 @@ public class SQLManager{
         
 	}
 	
-	public Map<Client, Integer> nbCommandPerClient() throws SQLException{
+	public ArrayList<ClientCountOrder> countCommandPerClient() throws SQLException{
 		String requestString = "SELECT \r\n"
 				+ "            clien.id_client,\r\n"
 				+ "            clien.firstname,\r\n"
@@ -322,14 +322,14 @@ public class SQLManager{
 		PreparedStatement pStatement = getCon().prepareStatement(requestString);
 
         ResultSet rSet = pStatement.executeQuery();
-        var result = new HashMap<Client, Integer>();
+        var result = new ArrayList<ClientCountOrder>();
         
         while(rSet.next()) {
         	int id = rSet.getInt(1);
         	String firstname = rSet.getNString(2);
         	String lastname = rSet.getNString(3);
         	int count = rSet.getInt(4);
-        	result.put(new Client(id, firstname, lastname), count);
+        	result.add(new ClientCountOrder(new Client(id, firstname, lastname), count));
         }
         return result;
         
@@ -429,7 +429,7 @@ public class SQLManager{
 				+ "            (\r\n"
 				+ "                -- Order price\r\n"
 				+ "                SELECT\r\n"
-				+ "                    pizz.price * pisi.multiplicator AS price\r\n"
+				+ "                    pizzas.price * pizzasizes.multiplicator AS price\r\n"
 				+ "                FROM pizzas, pizzasizes \r\n"
 				+ "                WHERE pizzasizes.id_size  = ? \r\n"
 				+ "                AND pizzas.id_pizza = ?\r\n"
@@ -636,6 +636,71 @@ public class SQLManager{
         }
         
         return result;
+        
+	}
+	
+	public Pizza bestPizza() throws SQLException{
+		String requestString = "SELECT\r\n"
+				+ "    pizz.label,\r\n"
+				+ "    orde.id_pizza,\r\n"
+				+ "    COUNT( orde.id_pizza) AS nbOrders\r\n"
+				+ "FROM\r\n"
+				+ "    orders  orde\r\n"
+				+ "INNER JOIN pizzas pizz ON\r\n"
+				+ "    orde.id_pizza = pizz.id_pizza\r\n"
+				+ "GROUP BY\r\n"
+				+ "    orde.id_pizza\r\n"
+				+ "ORDER BY\r\n"
+				+ "    nbOrders\r\n"
+				+ "DESC\r\n"
+				+ "LIMIT 1;\r\n"
+				+ "";
+
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+        ResultSet rSet = pStatement.executeQuery();
+        
+        if(rSet.next()) {
+        	String label = rSet.getNString(1);
+        	int id = rSet.getInt(2);
+        	double price = rSet.getDouble(3);
+        	return new Pizza(id,label,price);
+        }
+        
+        return null;
+        
+	}
+	
+	public Client bestClient() throws SQLException{
+		String requestString = "SELECT\r\n"
+				+ "    clie.firstname,\r\n"
+				+ "    clie.lastname,\r\n"
+				+ "    orde.id_client,\r\n"
+				+ "    COUNT(orde.id_client) AS nbOrders\r\n"
+				+ "FROM\r\n"
+				+ "    orders orde\r\n"
+				+ "INNER JOIN clients clie ON\r\n"
+				+ "    orde.id_client = clie.id_client\r\n"
+				+ "GROUP BY\r\n"
+				+ "    orde.id_client\r\n"
+				+ "ORDER BY\r\n"
+				+ "    nbOrders\r\n"
+				+ "DESC\r\n"
+				+ "LIMIT 1;";
+
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+        ResultSet rSet = pStatement.executeQuery();
+        
+        if(rSet.next()) {
+
+        	String firstname = rSet.getNString(1);
+        	String lastname = rSet.getNString(2);
+        	int id = rSet.getInt(3);
+        	return new Client(id,firstname,lastname);
+        }
+        
+        return null;
         
 	}
 	
