@@ -1,6 +1,7 @@
 package controler;
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.ResourceBundle;
@@ -21,6 +22,7 @@ import model.DeliveryGuy;
 import model.Order;
 import model.Pizza;
 import model.PizzaSize;
+import model.SQLManager;
 import model.Vehicle;
 
 public class OrderHistoryControler implements Initializable{
@@ -62,13 +64,18 @@ public class OrderHistoryControler implements Initializable{
     }
     
     ObservableList<Order> getOrderList(){
-    	ObservableList<Order> orders = FXCollections.observableArrayList();
-    	PizzaSize size = new PizzaSize(0,"gfrosse");
-    	Order o = new Order(1, new Pizza(1, "MaPizza", new ArrayList(), 10), new Client(1, "Fabien", "COURTOIS", "0457691356", "MonAdresse"), new DeliveryGuy(1, "LivreurP", "LivreurN", "0564534695"), new Vehicle(1, "Yaris", "Voiture"),size, new Date(), new Date());
-    	for (int i = 0; i < 20; i++) {
-    		orders.add(o);	
+    	ArrayList<Order> orders;
+    	ObservableList<Order> ordersObl;
+		try {
+			orders = SQLManager.getInstance().getOrders();
+			ordersObl = FXCollections.observableArrayList(orders);
+			return ordersObl;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-    	return orders;
+    	
+    	return null;
     }
 
 }

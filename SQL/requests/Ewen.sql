@@ -130,6 +130,28 @@
             )
         ) AS can_buy;
 
+    -- Modification pour JavaFX
+    SELECT 
+        0 <= (
+            (
+                -- Client account
+                SELECT
+                    acco.account_balance
+                FROM account AS acco
+                WHERE  
+                    acco.id_client = 1
+            )
+                -
+            (
+                -- Order price
+                SELECT
+                    pizz.price * pisi.multiplicator AS price
+                FROM pizzas, pizzasizes 
+                WHERE pizzasizes.id_size  = 1 
+                AND pizzas.id_pizza = 1
+            )
+        ) AS can_buy;
+
     -- Non-facturation des pizzas gratuites (retard ou fidélité)
     -- => $orderId, $clientId
     --public boolean isFreePizza(int orderId, int clientId)
@@ -202,5 +224,42 @@
     GROUP BY ingr.id_ingredient
     ORDER BY COUNT(*) DESC
     LIMIT 1;
+
+-- Orders informations
+
+SELECT
+    ord.id_order,
+    ord.order_timestamp,
+    ord.delivry_timestamp,
+    pizza.id_pizza,
+    pizza.label,
+    pizza.price,
+    size.id_size,
+    size.label,
+    deli.id_delivery_guy,
+    deli.firstname,
+    deli.lastname,
+    vehi.id_vehicle,
+    vehi.licence_plate,
+    vehi.label,
+    client.id_client,
+    client.firstname,
+    client.lastname
+FROM
+    orders AS ord
+JOIN pizzas AS pizza
+ON
+    pizza.id_pizza = ord.id_pizza
+JOIN pizzasizes AS size
+ON
+    size.id_size = ord.id_size
+JOIN deliveryguys AS deli
+ON
+    deli.id_delivery_guy = ord.id_delivery_guy
+JOIN vehicles AS vehi
+ON
+    vehi.id_vehicle = ord.id_vehicle
+JOIN clients AS client
+ON client.id_client = ord.id_client
 
     

@@ -44,7 +44,7 @@ public class CommandControler {
 	public void initialize() throws SQLException {
 		
 		//Init Vehicles
-		ArrayList<Vehicle> vehicles = SQLManager.getInstance().getVehicles();
+		ArrayList<Vehicle> vehicles = SQLManager.getInstance().freeVehicles();
 		ObservableList<Vehicle> obl_vehicles = FXCollections.observableArrayList(vehicles);
 		lv_vehicles.setItems(obl_vehicles);
 		
@@ -93,7 +93,7 @@ public class CommandControler {
 	    );
 		
 		//Init DeliveryGuys
-		ArrayList<DeliveryGuy> deliveryGuys = SQLManager.getInstance().getDeliveryGuys();
+		ArrayList<DeliveryGuy> deliveryGuys = SQLManager.getInstance().freeDeliveryGuys();
 		ObservableList<DeliveryGuy> obl_deliveryGuys = FXCollections.observableArrayList(deliveryGuys);
 		lv_delivryguys.setItems(obl_deliveryGuys);
 		
@@ -165,7 +165,9 @@ public class CommandControler {
 				return;
 			}else {
 				try {
-					SQLManager.getInstance().insertOrder(pizza, client, vehicle, deliveryGuy,size);
+					if(SQLManager.getInstance().canPay(pizza,size,client)) {
+						SQLManager.getInstance().insertOrder(pizza, client, vehicle, deliveryGuy,size);						
+					}
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

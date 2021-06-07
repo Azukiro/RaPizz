@@ -30,6 +30,13 @@ public class Pizza {
 		// TODO Auto-generated method stub
 		return label;
 	}
+	
+	
+
+
+	public double getPrice() {
+		return price;
+	}
 
 
 	@Override
