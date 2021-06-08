@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mar. 01 juin 2021 à 19:32
+-- Généré le : mar. 08 juin 2021 à 09:09
 -- Version du serveur :  10.4.17-MariaDB
 -- Version de PHP : 7.3.27
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données : `RaPizz`
+-- Base de données : `esiee`
 --
 
 -- --------------------------------------------------------
@@ -304,7 +304,8 @@ INSERT INTO `vehicles` (`id_vehicle`, `licence_plate`, `label`, `id_vehicle_type
 (2, 'B1-A1A-1N', 'Peugeot 208', 1),
 (3, 'B1-314-1N', 'Bugatti Chiron', 1),
 (4, 'B1-4Z4-1N', 'Honda Forza 125', 2),
-(5, '1Y-4D4-34', 'BMW R1200 ST', 2);
+(5, '1Y-4D4-34', 'BMW R1200 ST', 2),
+(6, '2Y-RD4-14', 'Volkswagen Arteon Sh', 1);
 
 -- --------------------------------------------------------
 
@@ -354,8 +355,8 @@ ALTER TABLE `clients`
 -- Index pour la table `composing`
 --
 ALTER TABLE `composing`
-  ADD PRIMARY KEY (`id_pizza`,`id_ingredient`),
-  ADD KEY `id_ingredient` (`id_ingredient`);
+  ADD KEY `id_ingredient` (`id_ingredient`),
+  ADD KEY `composing_ibfk_1` (`id_pizza`);
 
 --
 -- Index pour la table `deliveryguys`
@@ -408,6 +409,64 @@ ALTER TABLE `vehicles`
 ALTER TABLE `vehicletypes`
   ADD PRIMARY KEY (`id_vehicle_types`),
   ADD UNIQUE KEY `label` (`label`);
+
+--
+-- AUTO_INCREMENT pour les tables déchargées
+--
+
+--
+-- AUTO_INCREMENT pour la table `account`
+--
+ALTER TABLE `account`
+  MODIFY `id_login` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT pour la table `clients`
+--
+ALTER TABLE `clients`
+  MODIFY `id_client` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT pour la table `deliveryguys`
+--
+ALTER TABLE `deliveryguys`
+  MODIFY `id_delivery_guy` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT pour la table `ingredients`
+--
+ALTER TABLE `ingredients`
+  MODIFY `id_ingredient` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+
+--
+-- AUTO_INCREMENT pour la table `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `id_order` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT pour la table `pizzas`
+--
+ALTER TABLE `pizzas`
+  MODIFY `id_pizza` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT pour la table `pizzasizes`
+--
+ALTER TABLE `pizzasizes`
+  MODIFY `id_size` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT pour la table `vehicles`
+--
+ALTER TABLE `vehicles`
+  MODIFY `id_vehicle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT pour la table `vehicletypes`
+--
+ALTER TABLE `vehicletypes`
+  MODIFY `id_vehicle_types` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Contraintes pour les tables déchargées
