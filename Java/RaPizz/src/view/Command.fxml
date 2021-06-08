@@ -25,7 +25,13 @@
                   <ListView fx:id="lv_vehicles" prefHeight="83.0" prefWidth="252.0" />
                </children>
             </VBox>
-            <Button alignment="CENTER" contentDisplay="TOP" mnemonicParsing="false" prefHeight="43.0" prefWidth="127.0" text="Pass Command" fx:id="bt_command"/>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label text="Taille de la pizza" />
+                  <ListView fx:id="lv_pizzaSizes" prefHeight="200.0" prefWidth="200.0" />
+               </children>
+            </VBox>
+            <Button fx:id="bt_command" alignment="CENTER" contentDisplay="TOP" mnemonicParsing="false" prefHeight="43.0" prefWidth="127.0" text="Commander" />
          </children>
       </HBox>
    </bottom>

@@ -7,6 +7,7 @@ import com.mysql.cj.jdbc.MysqlDataSource;
 import javax.naming.Context;
 import java.io.IOException;
 import java.sql.*;
+import java.sql.Date;
 import java.util.*;
 
 public class SQLManager{
@@ -15,7 +16,7 @@ public class SQLManager{
     private static final String username = "root";
     private static final String password = ""; // le mien c'était le mot de passe de mon compte windows
     private static final String serverName = "localhost";
-    private static final String database = "tp5";
+    private static final String database = "rapizz";
     private static final int port = 3306;
 
     Context context;
@@ -75,8 +76,8 @@ public class SQLManager{
         String libe = "";
         while(rSet.next()) {
         	libe = rSet.getNString(2);
-        	int prix = rSet.getInt("Prix");
-        	System.out.println(libe+ "  "+ prix);
+        	int price = rSet.getInt("price");
+        	System.out.println(libe+ "  "+ price);
         }
 
        
@@ -85,7 +86,7 @@ public class SQLManager{
     private boolean testInsert(int staffId, int patientId, String title, int type, String description, String file, boolean isDraft) throws SQLException {
         //String link=CreateDynamicLink(file,patientId,title);
         final String searchNewID = 
-        	"INSERT INTO acte (MedicalFolder_idFolder, Nom, DateDebut, DateFin, Responsable, Prix, DocumentLink, IsADraft, DocumentType_idDocumentType, Description, idActe)\r\n" +
+        	"INSERT INTO acte (MedicalFolder_idFolder, Nom, DateDebut, DateFin, Responsable, price, DocumentLink, IsADraft, DocumentType_idDocumentType, Description, idActe)\r\n" +
             "VALUES (?, ?, ?, NULL, ?, NULL, ?, ?, ?, ?, NULL);";
         PreparedStatement s = getCon().prepareStatement(searchNewID);
         s.setInt(1, patientId);
@@ -127,36 +128,124 @@ public class SQLManager{
          int i = pStatement.executeUpdate();
         
     }
+    
+    public ArrayList<PizzaSize> getPizzaSizes() throws SQLException {
+		String requestString = "SELECT * FROM pizzasizes;";
 
-	public ArrayList<Vehicle> getVehicles() {
-		
-		
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+        ResultSet rSet = pStatement.executeQuery();
+        var result = new ArrayList<PizzaSize>();
+        
+        while(rSet.next()) {
+        	int id = rSet.getInt(1);
+        	String label = rSet.getNString(2);
+        	result.add(new PizzaSize(id, label));
+        }
+        
+        return result;
+	}  
+    
+
+	
+	
+	public ArrayList<Client> getClients() throws SQLException {
 		// TODO Auto-generated method stub
-		var result = new ArrayList<Vehicle>() ;
-		result.add(new Vehicle(0, "Clio", "Voiture"));
-		result.add(new Vehicle(0, "T-Max", "Scooter"));
-		result.add(new Vehicle(0, "Clio", "Voiture"));
-		result.add(new Vehicle(0, "T-Max", "Scooter"));
-		result.add(new Vehicle(0, "Clio", "Voiture"));
-		result.add(new Vehicle(0, "T-Max", "Scooter"));
+		String requestString = "SELECT clients.id_client, clients.firstname, clients.lastname  FROM clients;";
+
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+        ResultSet rSet = pStatement.executeQuery();
+        var result = new ArrayList<Client>();
+        
+        while(rSet.next()) {
+        	int id = rSet.getInt(1);
+        	String firstName = rSet.getNString(2);
+        	String lastName = rSet.getNString(3);
+        	result.add(new Client(id, firstName,lastName));
+        }
+        
 		return result;
 	}
 	
-	public ArrayList<Client> getClients() {
+	public ArrayList<Order> getOrders() throws SQLException {
 		// TODO Auto-generated method stub
-		var result = new ArrayList<Client>() ;
-		result.add(new Client(0, "Clio", "Voiture", "0651096591","128 avenue du caca"));
-		result.add(new Client(1, "Clio2", "Voiture3", "0651096591","128 avenue du caca"));
+		String requestString = "SELECT\r\n"
+				+ "    ord.id_order,\r\n"
+				+ "    ord.order_timestamp,\r\n"
+				+ "    ord.delivry_timestamp,\r\n"
+				+ "    pizza.id_pizza,\r\n"
+				+ "    pizza.label,\r\n"
+				+ "    pizza.price,\r\n"
+				+ "    size.id_size,\r\n"
+				+ "    size.label,\r\n"
+				+ "    deli.id_delivery_guy,\r\n"
+				+ "    deli.firstname,\r\n"
+				+ "    deli.lastname,\r\n"
+				+ "    vehi.id_vehicle,\r\n"
+				+ "    vehi.licence_plate,\r\n"
+				+ "    vehi.label,\r\n"
+				+ "    client.id_client,\r\n"
+				+ "    client.firstname,\r\n"
+				+ "    client.lastname\r\n"
+				+ "FROM\r\n"
+				+ "    orders AS ord\r\n"
+				+ "JOIN pizzas AS pizza\r\n"
+				+ "ON\r\n"
+				+ "    pizza.id_pizza = ord.id_pizza\r\n"
+				+ "JOIN pizzasizes AS size\r\n"
+				+ "ON\r\n"
+				+ "    size.id_size = ord.id_size\r\n"
+				+ "JOIN deliveryguys AS deli\r\n"
+				+ "ON\r\n"
+				+ "    deli.id_delivery_guy = ord.id_delivery_guy\r\n"
+				+ "JOIN vehicles AS vehi\r\n"
+				+ "ON\r\n"
+				+ "    vehi.id_vehicle = ord.id_vehicle\r\n"
+				+ "JOIN clients AS client\r\n"
+				+ "ON client.id_client = ord.id_client;";
+
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+        ResultSet rSet = pStatement.executeQuery();
+        var result = new ArrayList<Order>();
+        
+        while(rSet.next()) {
+        	int orderId = rSet.getInt(1);
+        	Date orderTime = rSet.getDate(2);
+        	Date deliveryTime = rSet.getDate(3);
+        	
+        	// Pizza
+        	int pizzaId = rSet.getInt(4);
+        	String pizzaLabel = rSet.getNString(5);
+        	double pizzaPrice = rSet.getDouble(6);
+        	Pizza pizza = new Pizza(pizzaId, pizzaLabel, pizzaPrice);
+        	//PizzaSize
+        	int sizeId = rSet.getInt(7);
+        	String sizeLabel = rSet.getNString(8);
+        	PizzaSize size = new PizzaSize(sizeId, sizeLabel);
+        	//DeliveryGuy
+        	int idDeliveryGuy = rSet.getInt(9);
+        	String firstNameDeliveryGuy = rSet.getNString(10);
+        	String lastNameDeliveryGuy = rSet.getNString(11);
+        	DeliveryGuy deliveryGuy = new DeliveryGuy(idDeliveryGuy, firstNameDeliveryGuy, lastNameDeliveryGuy);
+        	
+        	//Vehicle 
+        	int idVehicle = rSet.getInt(12);
+        	String plate = rSet.getNString(13);
+        	String label = rSet.getNString(14);
+        	Vehicle vehicle = new Vehicle(idVehicle, label, plate);
+        	//Client
+        	int idClient = rSet.getInt(15);
+        	String firstNameClient = rSet.getNString(16);
+        	String lastNameClient = rSet.getNString(17);
+        	Client client = new Client(idClient, firstNameClient, lastNameClient);
+        	result.add(new Order(orderId, pizza, client, deliveryGuy, vehicle, size, orderTime, deliveryTime));
+        }
+        
 		return result;
 	}
 
-	public ArrayList<DeliveryGuy> getDeliveryGuys() {
-		// TODO Auto-generated method stub
-		var result = new ArrayList<DeliveryGuy>() ;
-		result.add(new DeliveryGuy(0, "Mustang", "Ford", "0651096591"));
-		result.add(new DeliveryGuy(1, "Citroen", "Mercedes", "0651096591"));
-		return result;
-	}
 	
 	public Collection<Pizza> getPizzas() throws SQLException {
 		String requestString = "SELECT \r\n"
@@ -179,14 +268,14 @@ public class SQLManager{
         while(rSet.next()) {
         	int id_pizza = rSet.getInt(1);
         	String labelPizza = rSet.getNString(2);
-        	double prix = rSet.getDouble(3);
+        	double price = rSet.getDouble(3);
         	int id_ingredient = rSet.getInt(4);
         	String labelIngredient = rSet.getNString(5);
-        	if(!mapiIngredients.containsKey(id_pizza)) {
+        	if(!mapiIngredients.containsKey(id_ingredient)) {
         		mapiIngredients.put(id_ingredient, new Ingredient(id_ingredient, labelIngredient));
         	}
         	if(!mapPizzas.containsKey(id_pizza)) {
-        		mapPizzas.put(id_ingredient, new Pizza(id_pizza, labelPizza,prix));
+        		mapPizzas.put(id_pizza, new Pizza(id_pizza, labelPizza,price));
         	}
         	mapPizzas.get(id_pizza).addIngredient(mapiIngredients.get(id_ingredient));
         	
@@ -220,7 +309,7 @@ public class SQLManager{
         
 	}
 	
-	public Map<Client, Integer> nbCommandPerClient() throws SQLException{
+	public ArrayList<ClientCountOrder> countCommandPerClient() throws SQLException{
 		String requestString = "SELECT \r\n"
 				+ "            clien.id_client,\r\n"
 				+ "            clien.firstname,\r\n"
@@ -233,14 +322,14 @@ public class SQLManager{
 		PreparedStatement pStatement = getCon().prepareStatement(requestString);
 
         ResultSet rSet = pStatement.executeQuery();
-        var result = new HashMap<Client, Integer>();
+        var result = new ArrayList<ClientCountOrder>();
         
         while(rSet.next()) {
         	int id = rSet.getInt(1);
         	String firstname = rSet.getNString(2);
         	String lastname = rSet.getNString(3);
         	int count = rSet.getInt(4);
-        	result.put(new Client(id, firstname, lastname), count);
+        	result.add(new ClientCountOrder(new Client(id, firstname, lastname), count));
         }
         return result;
         
@@ -256,9 +345,9 @@ public class SQLManager{
 		PreparedStatement pStatement = getCon().prepareStatement(requestString);
 
         ResultSet rSet = pStatement.executeQuery();
-        int result = 0;
+        double result = 0;
         if(rSet.next()) {
-        	result = rSet.getInt(1);
+        	result = rSet.getDouble(1);
         	
         }
         return result;
@@ -303,12 +392,354 @@ public class SQLManager{
         
 	}
 	
+	public Map<String,Double> getTurnoverByMonth() throws SQLException{
+		String requestString = "SELECT\r\n"
+				+ "        DATE_FORMAT(orde.delivry_timestamp, \"%Y/%d\"),\r\n"
+				+ "        SUM(pizz.price * pisi.multiplicator) AS turnover \r\n"
+				+ "    FROM orders         AS orde\r\n"
+				+ "    JOIN pizzas         AS pizz     ON pizz.id_pizza = orde.id_pizza\r\n"
+				+ "    JOIN pizzasizes     AS pisi     ON pisi.id_size  = orde.id_size\r\n"
+				+ "    GROUP BY DATE_FORMAT(orde.delivry_timestamp, \"%Y/%d\");";
+		
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+        ResultSet rSet = pStatement.executeQuery();
+        var result = new HashMap<String, Double>();
+        while(rSet.next()) {
+        	String month = rSet.getNString(1);
+        	double price  = rSet.getDouble(2);
+        	result.put(month,price);
+        	
+        }
+        return result;
+	}
+	
+	public boolean canPay(Pizza pizza, PizzaSize size, Client client) throws SQLException {
+		String requestString = "SELECT \r\n"
+				+ "        0 <= (\r\n"
+				+ "            (\r\n"
+				+ "                -- Client account\r\n"
+				+ "                SELECT\r\n"
+				+ "                    acco.account_balance\r\n"
+				+ "                FROM account AS acco\r\n"
+				+ "                WHERE  \r\n"
+				+ "                    acco.id_client = ?\r\n"
+				+ "            )\r\n"
+				+ "                -\r\n"
+				+ "            (\r\n"
+				+ "                -- Order price\r\n"
+				+ "                SELECT\r\n"
+				+ "                    pizzas.price * pizzasizes.multiplicator AS price\r\n"
+				+ "                FROM pizzas, pizzasizes \r\n"
+				+ "                WHERE pizzasizes.id_size  = ? \r\n"
+				+ "                AND pizzas.id_pizza = ?\r\n"
+				+ "            )\r\n"
+				+ "        ) AS can_buy;";
+		
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+		pStatement.setInt(1, client.getId());
+		pStatement.setInt(2, size.getId());
+		pStatement.setInt(3, pizza.getId());
+        ResultSet rSet = pStatement.executeQuery();
+        boolean result = false;
+        if(rSet.next()) {
+        
+        	result = rSet.getBoolean(1);
+        	
+        }
+        return result;
+	}
+	
+	public boolean isFreePizza(int orderId, int clientId) throws SQLException {
+		String requestString = "  SELECT\r\n"
+				+ "        (\r\n"
+				+ "            (\r\n"
+				+ "                -- Free 10 pizza\r\n"
+				+ "                SELECT\r\n"
+				+ "                    (\r\n"
+				+ "                        COUNT(r2_orde.id_order) % 10\r\n"
+				+ "                    ) = 0 AS free_10_pizza\r\n"
+				+ "                FROM orders             AS r2_orde\r\n"
+				+ "                WHERE \r\n"
+				+ "                    r2_orde.id_client = ?\r\n"
+				+ "            )\r\n"
+				+ "                OR\r\n"
+				+ "            (\r\n"
+				+ "                -- Free late pizza\r\n"
+				+ "                SELECT\r\n"
+				+ "                    (\r\n"
+				+ "                        DATEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) >= 1\r\n"
+				+ "                            OR\r\n"
+				+ "                        (\r\n"
+				+ "                            DATEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) = 0\r\n"
+				+ "                                AND\r\n"
+				+ "                            TIMEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) >= \"00:30:00\"\r\n"
+				+ "                        )\r\n"
+				+ "                    ) AS late_order\r\n"
+				+ "                FROM orders             AS r2_orde\r\n"
+				+ "                WHERE \r\n"
+				+ "                    r2_orde.id_order = ?\r\n"
+				+ "            )\r\n"
+				+ "        ) AS is_pizza_free;";
+		
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+		pStatement.setInt(1, clientId);
+		pStatement.setInt(2, orderId);
+        ResultSet rSet = pStatement.executeQuery();
+        boolean result = false;
+        if(rSet.next()) {
+        
+        	result = rSet.getBoolean(1);
+        	
+        }
+        return result;
+	}
+	
+	public Map<DeliveryGuy,Vehicle> worthDeliveryGuy() throws SQLException {
+		String requestString = " SELECT \r\n"
+				+ "            r2_degu.id_delivery_guy, \r\n"
+				+ "            r2_degu.firstname,\r\n"
+				+ "            r2_degu.lastname,\r\n"
+				+ "            r2_vehi.id_vehicle,\r\n"
+				+ "            r2_vehi.label,\r\n"
+				+ "            r2_vehi.licence_plate,\r\n"
+				+ "            COUNT(*) AS late_orders_nb\r\n"
+				+ "        FROM deliveryguys 	AS r2_degu \r\n"
+				+ "        JOIN orders 		AS r2_orde		ON r2_orde.id_delivery_guy = r2_degu.id_delivery_guy 	\r\n"
+				+ "        JOIN vehicles 		AS r2_vehi      ON r2_orde.id_vehicle      = r2_vehi.id_vehicle\r\n"
+				+ "        WHERE\r\n"
+				+ "            DATEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) >= 1\r\n"
+				+ "                OR\r\n"
+				+ "            (\r\n"
+				+ "                DATEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) = 0\r\n"
+				+ "                    AND\r\n"
+				+ "                TIMEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) >= \"00:30:00\"\r\n"
+				+ "            )\r\n"
+				+ "        GROUP BY r2_degu.id_delivery_guy\r\n"
+				+ "    	ORDER BY COUNT(*) DESC\r\n"
+				+ "        LIMIT 1;";
+		
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+        ResultSet rSet = pStatement.executeQuery();
+        var result = new HashMap<DeliveryGuy,Vehicle>();
+        if(rSet.next()) {
+        
+        	DeliveryGuy guy = new DeliveryGuy(rSet.getInt(1),rSet.getNString(2),rSet.getNString(3));
+        	Vehicle vehicle = new Vehicle(rSet.getInt(1),rSet.getNString(2),rSet.getNString(3));
+        	result.put(guy,vehicle);
+        	
+        }
+        return result;
+	}
+	
+	public Ingredient favoriteIngredient() throws SQLException {
+		String requestString = " SELECT \r\n"
+				+ "        *,\r\n"
+				+ "        COUNT(*) AS order_nb\r\n"
+				+ "    FROM ingredients 	AS ingr \r\n"
+				+ "    JOIN composing 		AS comp 	ON comp.id_ingredient = ingr.id_ingredient\r\n"
+				+ "    JOIN pizzas			AS pizz  	ON pizz.id_pizza      = comp.id_pizza\r\n"
+				+ "    JOIN orders			AS orde		ON orde.id_pizza      = pizz.id_pizza\r\n"
+				+ "    GROUP BY ingr.id_ingredient\r\n"
+				+ "    ORDER BY COUNT(*) DESC\r\n"
+				+ "    LIMIT 1;";
+		
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+        ResultSet rSet = pStatement.executeQuery();
+        Ingredient result = null;
+        if(rSet.next()) {
+        
+        	result = new Ingredient(rSet.getInt(1),rSet.getNString(2));
+        	
+        }
+        return result;
+	}
+	
+	public ArrayList<Vehicle> freeVehicles() throws SQLException{
+		String requestString = "SELECT\r\n"
+				+ "    vehi.id_vehicle,\r\n"
+				+ "    vehi.licence_plate,\r\n"
+				+ "    vehi.label\r\n"
+				+ "FROM\r\n"
+				+ "    orders orde\r\n"
+				+ "INNER JOIN vehicles vehi ON\r\n"
+				+ "    orde.id_vehicle = vehi.id_vehicle\r\n"
+				+ "WHERE\r\n"
+				+ "    orde.id_vehicle NOT IN(\r\n"
+				+ "    SELECT\r\n"
+				+ "        vehi.id_vehicle\r\n"
+				+ "    FROM\r\n"
+				+ "        orders orde\r\n"
+				+ "    INNER JOIN vehicles vehi ON\r\n"
+				+ "        orde.id_vehicle = vehi.id_vehicle\r\n"
+				+ "    WHERE\r\n"
+				+ "        orde.delivry_timestamp IS NULL\r\n"
+				+ "    GROUP BY\r\n"
+				+ "        vehi.id_vehicle\r\n"
+				+ ")\r\n"
+				+ "GROUP BY\r\n"
+				+ "    vehi.id_vehicle;";
+
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+        ResultSet rSet = pStatement.executeQuery();
+        var result = new ArrayList<Vehicle>();
+        
+        while(rSet.next()) {
+        	int id = rSet.getInt(1);
+        	String plate = rSet.getNString(2);
+        	String label = rSet.getNString(3);
+        	result.add(new Vehicle(id, label,plate));
+        }
+        
+        return result;
+        
+	}
 	
 	
-	public void insertOrder(Pizza pizza, Client client, Vehicle vehicle, DeliveryGuy deliveryGuy) {
-		System.out.println("Test");
+	
+	public ArrayList<DeliveryGuy> freeDeliveryGuys() throws SQLException{
+		String requestString = "SELECT\r\n"
+				+ "    deli.id_delivery_guy,\r\n"
+				+ "    deli.firstname,\r\n"
+				+ "    deli.lastname\r\n"
+				+ "FROM\r\n"
+				+ "    orders orde\r\n"
+				+ "INNER JOIN deliveryguys deli ON\r\n"
+				+ "    orde.id_delivery_guy = deli.id_delivery_guy\r\n"
+				+ "WHERE\r\n"
+				+ "    orde.id_delivery_guy NOT IN(\r\n"
+				+ "    SELECT\r\n"
+				+ "        deli.id_delivery_guy\r\n"
+				+ "    FROM\r\n"
+				+ "        orders orde\r\n"
+				+ "    INNER JOIN deliveryguys deli ON\r\n"
+				+ "        orde.id_delivery_guy = deli.id_delivery_guy\r\n"
+				+ "    WHERE\r\n"
+				+ "        orde.delivry_timestamp IS NULL\r\n"
+				+ "    GROUP BY\r\n"
+				+ "        deli.id_delivery_guy\r\n"
+				+ ")\r\n"
+				+ "GROUP BY\r\n"
+				+ "    deli.id_delivery_guy;";
+
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+        ResultSet rSet = pStatement.executeQuery();
+        var result = new ArrayList<DeliveryGuy>();
+        
+        while(rSet.next()) {
+        	int id = rSet.getInt(1);
+        	String firstName = rSet.getNString(2);
+        	String lastName = rSet.getNString(3);
+        	result.add(new DeliveryGuy(id, firstName,lastName));
+        }
+        
+        return result;
+        
+	}
+	
+	public Pizza bestPizza() throws SQLException{
+		String requestString = "SELECT\r\n"
+				+ "    pizz.label,\r\n"
+				+ "    orde.id_pizza,\r\n"
+				+ "    COUNT( orde.id_pizza) AS nbOrders\r\n"
+				+ "FROM\r\n"
+				+ "    orders  orde\r\n"
+				+ "INNER JOIN pizzas pizz ON\r\n"
+				+ "    orde.id_pizza = pizz.id_pizza\r\n"
+				+ "GROUP BY\r\n"
+				+ "    orde.id_pizza\r\n"
+				+ "ORDER BY\r\n"
+				+ "    nbOrders\r\n"
+				+ "DESC\r\n"
+				+ "LIMIT 1;\r\n"
+				+ "";
+
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+        ResultSet rSet = pStatement.executeQuery();
+        
+        if(rSet.next()) {
+        	String label = rSet.getNString(1);
+        	int id = rSet.getInt(2);
+        	double price = rSet.getDouble(3);
+        	return new Pizza(id,label,price);
+        }
+        
+        return null;
+        
+	}
+	
+	public Client bestClient() throws SQLException{
+		String requestString = "SELECT\r\n"
+				+ "    clie.firstname,\r\n"
+				+ "    clie.lastname,\r\n"
+				+ "    orde.id_client,\r\n"
+				+ "    COUNT(orde.id_client) AS nbOrders\r\n"
+				+ "FROM\r\n"
+				+ "    orders orde\r\n"
+				+ "INNER JOIN clients clie ON\r\n"
+				+ "    orde.id_client = clie.id_client\r\n"
+				+ "GROUP BY\r\n"
+				+ "    orde.id_client\r\n"
+				+ "ORDER BY\r\n"
+				+ "    nbOrders\r\n"
+				+ "DESC\r\n"
+				+ "LIMIT 1;";
+
+		PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+        ResultSet rSet = pStatement.executeQuery();
+        
+        if(rSet.next()) {
+
+        	String firstname = rSet.getNString(1);
+        	String lastname = rSet.getNString(2);
+        	int id = rSet.getInt(3);
+        	return new Client(id,firstname,lastname);
+        }
+        
+        return null;
+        
+	}
+	
+
+	
+	
+	public boolean insertOrder(Pizza pizza, Client client, Vehicle vehicle, DeliveryGuy deliveryGuy,PizzaSize size) throws SQLException {
+		final String request =  "INSERT INTO `orders`(\r\n"
+				+ "    `id_order`,\r\n"
+				+ "    `order_timestamp`,\r\n"
+				+ "    `delivry_timestamp`,\r\n"
+				+ "    `id_size`,\r\n"
+				+ "    `id_vehicle`,\r\n"
+				+ "    `id_client`,\r\n"
+				+ "    `id_delivery_guy`,\r\n"
+				+ "    `id_pizza`\r\n"
+				+ ")\r\n"
+				+ "VALUES(\r\n"
+				+ "    NULL,\r\n"
+				+ "    NOW(), \r\n"
+				+ "    NULL, \r\n"
+				+ "    ?, \r\n"
+				+ "    ?, \r\n"
+				+ "    ?, \r\n"
+				+ "    ?,\r\n"
+				+ "    ?\r\n"
+				+ ");";
+	        	
+	        PreparedStatement s = getCon().prepareStatement(request);
+	        s.setInt(1, size.getId());
+	        s.setInt(2, vehicle.getId());
+	        s.setInt(3, client.getId());
+	        s.setInt(4, deliveryGuy.getId());
+	        s.setInt(5, pizza.getId());
+	        return !s.execute();
 		
 	}
+
+	
 
 
 }

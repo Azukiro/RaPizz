@@ -30,6 +30,10 @@ public class Client {
 		return lastName;
 	}
 	
+	public String getFullName() {
+		return getFirstName()+" "+getLastName();
+	}
+	
 	
 	
 	@Override
@@ -82,6 +86,11 @@ public class Client {
 	public String toString() {
 		// TODO Auto-generated method stub
 		return firstName+" "+lastName;
+	}
+	
+	public int getId() {
+		// TODO Auto-generated method stub
+		return id;
 	}
 	
 }

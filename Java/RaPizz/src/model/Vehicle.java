@@ -4,23 +4,23 @@ public class Vehicle {
 	
 	private final int id;
 	private final String label;
-	private final String type;
+	private final String plate;
 	
 	public Vehicle(int id, String label) {
 		this(id, label, "Default");
 	}
 	
-	public Vehicle(int id, String label, String type) {
+	public Vehicle(int id, String label, String plate) {
 		super();
 		this.id = id;
 		this.label = label;
-		this.type = type;
+		this.plate = plate;
 	}
 
 
-	public String getType() {
+	public String getPlate() {
 		// TODO Auto-generated method stub
-		return type;
+		return plate;
 	}
 	
 	public String getLabel() {
@@ -40,7 +40,7 @@ public class Vehicle {
 		int result = 1;
 		result = prime * result + id;
 		result = prime * result + ((label == null) ? 0 : label.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((plate == null) ? 0 : plate.hashCode());
 		return result;
 	}
 
@@ -60,12 +60,17 @@ public class Vehicle {
 				return false;
 		} else if (!label.equals(other.label))
 			return false;
-		if (type == null) {
-			if (other.type != null)
+		if (plate == null) {
+			if (other.plate != null)
 				return false;
-		} else if (!type.equals(other.type))
+		} else if (!plate.equals(other.plate))
 			return false;
 		return true;
+	}
+
+	public int getId() {
+		// TODO Auto-generated method stub
+		return id;
 	}
 	
 	
