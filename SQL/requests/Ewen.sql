@@ -226,7 +226,6 @@
     LIMIT 1;
 
 -- Orders informations
-
 SELECT
     ord.id_order,
     ord.order_timestamp,
@@ -262,4 +261,21 @@ ON
 JOIN clients AS client
 ON client.id_client = ord.id_client
 
-    
+-- Tous les clients ayant acheté toutes les pizzas (division)
+SELECT * FROM clients AS clien_0
+WHERE NOT EXISTS (
+    -- Les id de pizzas non commandées par le client
+    (
+        -- Toutes id de pizzas
+        SELECT pizza_1.id_pizza
+        FROM pizzas AS pizza_1
+    )
+        EXCEPT
+    (
+        -- Tous id de pizzas commandées par 1 client
+        SELECT DISTINCT(order_1.id_pizza)
+        FROM orders AS order_1 
+        WHERE order_1.id_client = clien_0.id_client
+    ) 
+);
+
