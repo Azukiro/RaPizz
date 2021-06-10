@@ -511,3 +511,100 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+DROP FUNCTION IF EXISTS IsFreePizza;
+DROP FUNCTION IF EXISTS GetPizzaPrice;
+DROP TRIGGER IF EXISTS after_edit_order_timestamp;
+
+DELIMITER //
+
+-- IsFreePizza
+CREATE FUNCTION IsFreePizza(pOrderId INT, pClientId INT) 
+  RETURNS INT
+
+  BEGIN
+    DECLARE isFreePizza INT;
+
+    SET isFreePizza = (
+        SELECT
+        (
+            (
+                -- Free 10 pizza
+                SELECT
+                    (
+                        COUNT(r2_orde.id_order) % 10
+                    ) = 0 AS free_10_pizza
+                FROM orders             AS r2_orde
+                WHERE 
+                    r2_orde.id_client = pClientId
+            )
+                OR
+            (
+                -- Free late pizza
+                SELECT
+                    (
+                        DATEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) >= 1
+                            OR
+                        (
+                            DATEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) = 0
+                                AND
+                            TIMEDIFF(r2_orde.delivry_timestamp, r2_orde.order_timestamp) >= "00:30:00"
+                        )
+                    ) AS late_order
+                FROM orders             AS r2_orde
+                WHERE 
+                    r2_orde.id_order = pOrderId
+            )
+        ) AS is_pizza_free
+    );
+
+    RETURN isFreePizza;
+  END //
+
+-- GetPizzaPrice
+CREATE FUNCTION GetPizzaPrice(pOrderId INT)
+  RETURNS INT
+
+  BEGIN
+    DECLARE pizzaPrice DOUBLE;
+    SET pizzaPrice = (
+        SELECT
+            pizz.price * pisi.multiplicator AS price
+        FROM orders         AS orde
+        JOIN pizzas         AS pizz     ON pizz.id_pizza = orde.id_pizza
+        JOIN pizzasizes     AS pisi     ON pisi.id_size  = orde.id_size
+        WHERE
+            orde.id_order = pOrderId
+    );
+
+    RETURN pizzaPrice;
+  END //
+
+-- After_edit_order_timestamp
+CREATE TRIGGER after_edit_order_timestamp
+    AFTER UPDATE ON orders 
+    FOR EACH ROW
+    BEGIN
+        DECLARE isFreePizza INT;
+        DECLARE pizzaPrice DOUBLE;
+
+        IF (NEW.delivry_timestamp IS NOT NULL) AND (OLD.delivry_timestamp IS NULL) THEN
+
+            SET isFreePizza = (SELECT IsFreePizza(NEW.id_order, NEW.id_client));
+
+            IF (isFreePizza = 0) THEN
+                    
+                SET pizzaPrice = (SELECT GetPizzaPrice(NEW.id_order));
+                
+                -- Pay the pizza
+                
+                UPDATE account
+                SET account_balance = account_balance - pizzaPrice
+                WHERE
+                    id_client = NEW.id_client;
+
+            END IF;
+        END IF;
+    END //
+
+DELIMITER ;
