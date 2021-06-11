@@ -1,4 +1,3 @@
-
 # RaPizz
 
 ## Cadre du projet
@@ -19,8 +18,6 @@ On veut modéliser la gestion d’une entreprise de fabrication et de **livraiso
 
 ## Membres du projet
 
-  
-
 - Lucas BILLARD
 
 - Ewen BOUQUET
@@ -38,14 +35,14 @@ Dans un premier temps, nous avons analysé le sujet et en avons déduit un **MCD
 
 > Associations : `Connecting`, `Composing`, `Containing`, `Sizing`, `Belonging`, `Ordering`, `Driving`, `Living`, et `DeliveryGuys` ;
 
-![MCD](https://media.discordapp.net/attachments/849338202480967771/852455923627720705/unknown.png "MCD")
+![MCD](https://raw.githubusercontent.com/Azukiro/RaPizz/main/Screenshot/mcd.png "MCD")
 
 
 ## Modèle Logique de Données
 
 A partir du logiciel `Looping`, nous avons généré le MLD de la base de données.
 
-![MCD](https://media.discordapp.net/attachments/849338202480967771/852459444137754634/unknown.png "MLD")
+![MCD](https://raw.githubusercontent.com/Azukiro/RaPizz/main/Screenshot/mld.png "MLD")
 
 ## Modèle Physique de Données
   
@@ -799,4 +796,293 @@ VALUES(
 
 # Interface Homme Machine
 
-Suite à l'implémentation des requêtes SQL, nous avons réalisé une **IHM** permettant de gérer
+Suite à l'implémentation des requêtes SQL, nous avons réalisé une **IHM** permettant de gérer les commandes de pizzas de RaPizz.
+
+> Passer une commande ;
+
+> Visualiser les commandes ;
+
+> Afficher les statistiques de la pizzeria ;
+
+### Passage de commande
+
+Cette page permet d'effectuer une commande :
+- Saisie du client ;
+- Saisie de la pizza commandée et de sa taille;
+- Saisie du livreur et du véhicule de livraison ;
+
+![Passer une commande](https://raw.githubusercontent.com/Azukiro/RaPizz/main/Screenshot/PassCommand.png "Pass a command")
+
+### Visualisation des commandes
+
+Cette page permet de visualiser les différentes commandes.
+
+![Historique des commandes](https://raw.githubusercontent.com/Azukiro/RaPizz/main/Screenshot/ordersView.png "Pass a command")
+
+### Statistiques de l'application
+
+Cette page permet d'afficher les statistiques de l'application, à savoir :
+- Le meilleur client ;
+- Le plus mauvais livreur ;
+- Le plus mauvais véhicule ;
+- La pizza la plus demandée ;
+- L'ingrédient favori ;
+- Le nombre moyen de commandes par personnes ;
+- Le nombre de commandes par client ;
+- Les véhicules n'ayant jamais servi ;
+- Le nombre de commandes supérieures à la moyenne ;
+
+![Statistique des commandes](https://raw.githubusercontent.com/Azukiro/RaPizz/main/Screenshot/stats.png "Pass a command")
+
+# Connexion entre Java et la Base de données avec JDBC
+
+Nous avons mis en place un singleton appelé `SqlManager` pour centraliser la gestion des accès à la base de données. 
+
+### Connexion à JDBC 
+```Java
+private static final String username = "root";
+private static final String password = ""; 
+private static final String serverName = "localhost";
+private static final String database = "rapizz";
+private static final int port = 3306;
+
+Context context;
+MysqlDataSource dataSource;
+Connection con;
+
+// singleton pattern
+private SQLManager() {
+    try {
+        dataSource = new MysqlDataSource();
+        dataSource.setUser(username);
+        dataSource.setPassword(password);
+        dataSource.setServerName(serverName);
+        dataSource.setDatabaseName(database);
+        dataSource.setPort(port);
+        dataSource.setServerTimezone("UTC");
+        System.out.println("Tentative de connexion...");
+        con = dataSource.getConnection();
+        System.out.println("Connection = " + con);
+
+    } catch (SQLException e) {
+        System.err.println("[ERROR]");
+        System.err.println("MySQL Connexion exception: " + e);        
+    }
+}
+
+private Connection getCon() {
+    try {
+        return dataSource.getConnection();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+
+private static SQLManager INSTANCE;
+
+public static SQLManager getInstance() throws SQLException {
+    if (INSTANCE == null) {
+        INSTANCE = new SQLManager();
+    }
+    return INSTANCE;
+}
+```
+
+### Utilisation de JDBC pour récupérer des données
+
+Dans cette fonction, nous réupérons le **meilleur client** via une requête SQL appliqué à la **base de données**.
+
+```Java
+public Client bestClient() throws SQLException {
+
+	String requestString = "SELECT\r\n"
+            + "    clie.firstname,\r\n"
+            + "    clie.lastname,\r\n"
+            + "    orde.id_client,\r\n"
+            + "    COUNT(orde.id_client) AS nbOrders\r\n"
+            + "FROM\r\n"
+            + "    orders orde\r\n"
+            + "INNER JOIN clients clie ON\r\n"
+            + "    orde.id_client = clie.id_client\r\n"
+            + "GROUP BY\r\n"
+            + "    orde.id_client\r\n"
+            + "ORDER BY\r\n"
+            + "    nbOrders\r\n"
+            + "DESC\r\n"
+            + "LIMIT 1;";
+
+    PreparedStatement pStatement = getCon().prepareStatement(requestString);
+
+    ResultSet rSet = pStatement.executeQuery();
+    
+    if(rSet.next()) {
+
+        String firstname = rSet.getNString(1);
+        String lastname = rSet.getNString(2);
+        int id = rSet.getInt(3);
+        return new Client(id,firstname,lastname);
+    }
+    
+    return null;
+    
+}
+```
+
+### Utilisation de JDBC pour insérer des valeurs dans la base de donnée
+
+```Java
+public boolean insertOrder(Pizza pizza, Client client, Vehicle vehicle, DeliveryGuy deliveryGuy,PizzaSize size) throws SQLException {
+    
+    final String request =  "INSERT INTO `orders`(\r\n"
+        + "    `id_order`,\r\n"
+        + "    `order_timestamp`,\r\n"
+        + "    `delivry_timestamp`,\r\n"
+        + "    `id_size`,\r\n"
+        + "    `id_vehicle`,\r\n"
+        + "    `id_client`,\r\n"
+        + "    `id_delivery_guy`,\r\n"
+        + "    `id_pizza`\r\n"
+        + ")\r\n"
+        + "VALUES(\r\n"
+        + "    NULL,\r\n"
+        + "    NOW(), \r\n"
+        + "    NULL, \r\n"
+        + "    ?, \r\n"
+        + "    ?, \r\n"
+        + "    ?, \r\n"
+        + "    ?,\r\n"
+        + "    ?\r\n"
+        + ");";
+        
+    PreparedStatement s = getCon().prepareStatement(request);
+    s.setInt(1, size.getId());
+    s.setInt(2, vehicle.getId());
+    s.setInt(3, client.getId());
+    s.setInt(4, deliveryGuy.getId());
+    s.setInt(5, pizza.getId());
+    
+    return !s.execute();
+}
+```
+
+### Utilisation de modèles pour renvoyer les données
+
+Nous avons utilisé des **classes modèles** afin de **formatter** de manière uniforme les données récupérées suite à une requête SQL. Par exemple, la classe `Client` représente une ligne de la table `clients`.
+
+```Java
+package model;
+
+public class Client {
+	
+    // Champs privés
+	private final int id;
+	private final String firstName;
+	private final String lastName;
+	private final String phone;
+	private final String adress;
+	
+	// Constructeurs
+	public Client(int id, String firstName, String lastName) {
+		this(id,firstName,lastName,null,null);
+	}
+	
+	public Client(int id, String firstName, String lastName, String phone,String adress) {
+		super();
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.phone = phone;
+		this.adress = adress;
+	}
+
+	// Getters
+	public int getId() {
+		return id;
+	}
+    
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+	
+	public String getFullName() {
+		return getFirstName()+" "+getLastName();
+	}
+	
+    // Hash code
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((adress == null) ? 0 : adress.hashCode());
+		result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
+		result = prime * result + id;
+		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
+		result = prime * result + ((phone == null) ? 0 : phone.hashCode());
+		return result;
+	}
+
+	// Equals
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Client other = (Client) obj;
+		if (adress == null) {
+			if (other.adress != null)
+				return false;
+		} else if (!adress.equals(other.adress))
+			return false;
+		if (firstName == null) {
+			if (other.firstName != null)
+				return false;
+		} else if (!firstName.equals(other.firstName))
+			return false;
+		if (id != other.id)
+			return false;
+		if (lastName == null) {
+			if (other.lastName != null)
+				return false;
+		} else if (!lastName.equals(other.lastName))
+			return false;
+		if (phone == null) {
+			if (other.phone != null)
+				return false;
+		} else if (!phone.equals(other.phone))
+			return false;
+		return true;
+	}
+
+	// To string
+	@Override
+	public String toString() {
+		return firstName + " " + lastName;
+	}
+	
+}
+
+```
+
+# Accès au projet complet
+
+Vous trouverez associé à ce pdf un zip contenant l'ensemble du **code du projet** développé sous Eclipse ainsi que les **requêtes SQL**.
+
+Le projet est également diponible sur [Github](https://github.com/Azukiro/RaPizz).
+
+## Membres du projet
+
+- Lucas BILLARD
+
+- Ewen BOUQUET
+
+- Fabien COURTOIS
+
+- Loic FOURNIER
