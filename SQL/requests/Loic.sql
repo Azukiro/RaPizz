@@ -48,6 +48,7 @@ ASC
 LIMIT 1;
 
 -- Vérification du solde
+-- Don't need on app for moment
 SELECT
     acco.account_balance
 FROM
@@ -56,6 +57,7 @@ WHERE
     acco.id_client = 1; -- => $clientId
 
 -- Facturation de la commande
+-- Don't need on app for moment
 UPDATE account acco
 SET
     acco.account_balance = acco.account_balance -(
@@ -78,7 +80,9 @@ WHERE
 
 
 -- Vehicules libres
+-- public ArrayList<Vehicle> freeVehicles()
 SELECT
+    vehi.id_vehicle,
     vehi.licence_plate,
     vehi.label
 FROM
@@ -104,6 +108,7 @@ GROUP BY
 
 
 -- Livreurs libres
+-- public ArrayList<DeliveryGuy> freeDeliveryGuys()
 SELECT
     deli.*
 FROM
